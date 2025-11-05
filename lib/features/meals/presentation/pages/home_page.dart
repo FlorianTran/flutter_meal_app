@@ -7,6 +7,7 @@ import '../notifier/meal_of_day_notifier.dart';
 import '../notifier/meal_of_day_state.dart';
 import '../widgets/meal_of_day_card.dart';
 import '../widgets/category_list.dart';
+import 'meal_catalog_page.dart';
 
 /// Home page based on Figma design
 class HomePage extends ConsumerStatefulWidget {
@@ -263,11 +264,14 @@ class _HomePageState extends ConsumerState<HomePage> {
         CategoryList(
           categories: state.categories,
           onCategoryTap: (category) {
-            // TODO: Navigate to meal catalog filtered by category
-            // Navigator.push(
-            //   context,
-            //   MealCatalogPage.route(category: category.name),
-            // );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MealCatalogPage(
+                  initialCategory: category.name,
+                ),
+              ),
+            );
           },
         ),
       ],
@@ -310,17 +314,27 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
           // List button (inactive - grey)
           Expanded(
-            child: Container(
-              margin: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.list,
-                  color: Colors.grey[600],
-                  size: 24,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MealCatalogPage(),
+                  ),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.list,
+                    color: Colors.grey[600],
+                    size: 24,
+                  ),
                 ),
               ),
             ),
