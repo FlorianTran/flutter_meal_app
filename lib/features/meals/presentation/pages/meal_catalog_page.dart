@@ -7,6 +7,7 @@ import '../notifier/home_notifier.dart';
 import '../widgets/meal_card.dart';
 import '../widgets/search_bar.dart' show MealSearchBar;
 import '../widgets/filter_chips.dart';
+import 'meal_details_page.dart';
 
 /// Meal Catalog page with search, filter, and sort
 class MealCatalogPage extends ConsumerStatefulWidget {
@@ -180,8 +181,12 @@ class _MealCatalogPageState extends ConsumerState<MealCatalogPage> {
           return MealCard(
             meal: meal,
             onTap: () {
-              // TODO: Navigate to meal details
-              // Navigator.push(context, MealDetailsPage.route(mealId: meal.id));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MealDetailsPage(mealId: meal.id),
+                ),
+              );
             },
           );
         },

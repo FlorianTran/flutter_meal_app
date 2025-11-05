@@ -8,6 +8,7 @@ import '../notifier/meal_of_day_state.dart';
 import '../widgets/meal_of_day_card.dart';
 import '../widgets/category_list.dart';
 import 'meal_catalog_page.dart';
+import 'meal_details_page.dart';
 
 /// Home page based on Figma design
 class HomePage extends ConsumerStatefulWidget {
@@ -149,8 +150,12 @@ class _HomePageState extends ConsumerState<HomePage> {
         MealOfDayCard(
           meal: state.meal!,
           onTap: () {
-            // TODO: Navigate to meal details page
-            // Navigator.push(context, MealDetailsPage.route(mealId: state.meal!.id));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MealDetailsPage(mealId: state.meal!.id),
+              ),
+            );
           },
         ),
       ],
