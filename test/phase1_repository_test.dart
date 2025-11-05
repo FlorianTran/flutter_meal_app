@@ -1,4 +1,3 @@
-import 'package:flutter_meal_app/features/meals/data/datasources/mealdb_local_data_source.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_meal_app/core/network/mealdb_api_client.dart';
@@ -13,7 +12,6 @@ void main() {
   group('Phase 1.1: Repository & Use Cases Tests', () {
     late MealDbApiClient apiClient;
     late MealDbRemoteDataSource remoteDataSource;
-    late MealDbLocalDataSource localDataSource;
     late MealsRepositoryImpl repository;
 
     setUpAll(() async {
@@ -25,8 +23,7 @@ void main() {
         baseUrl: 'https://www.themealdb.com/api/json/v1/1/',
       );
       remoteDataSource = MealDbRemoteDataSourceImpl(apiClient: apiClient);
-      localDataSource = MealDbLocalDataSourceImpl();
-      repository = MealsRepositoryImpl(remoteDataSource: remoteDataSource, localDataSource: localDataSource);
+      repository = MealsRepositoryImpl(remoteDataSource: remoteDataSource);
     });
 
     tearDown(() {
