@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../domain/entities/meal.dart';
 import '../notifier/meal_details_notifier.dart';
 import '../notifier/meal_details_state.dart';
 import '../widgets/meal_ingredients_list.dart';
@@ -269,7 +270,7 @@ class MealDetailsPage extends ConsumerWidget {
     }
   }
 
-  void _shareMeal(BuildContext context, meal) {
+  void _shareMeal(BuildContext context, Meal meal) {
     final text = 'Check out this recipe: ${meal.name}\n${meal.sourceUrl ?? ''}';
     Share.share(
       text,
