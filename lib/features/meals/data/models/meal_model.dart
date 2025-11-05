@@ -1,3 +1,5 @@
+import 'package:flutter_meal_app/features/meals/domain/entities/ingredient.dart';
+
 import '../../domain/entities/meal.dart';
 
 /// Meal data model
@@ -19,7 +21,7 @@ class MealModel extends Meal {
     // MealDB API returns meal data as a Map
     final mealData = json;
 
-    final ingredients = <MealIngredient>[];
+    final ingredients = <Ingredient>[];
 
     // Extract ingredients from strIngredient1-20 and strMeasure1-20
     for (int i = 1; i <= 20; i++) {
@@ -27,7 +29,7 @@ class MealModel extends Meal {
       final measure = mealData['strMeasure$i'] as String?;
 
       if (ingredientName != null && ingredientName.trim().isNotEmpty) {
-        ingredients.add(MealIngredient(
+        ingredients.add(Ingredient(
           name: ingredientName.trim(),
           measurement: measure?.trim(),
         ));
