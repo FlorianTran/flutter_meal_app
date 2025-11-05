@@ -15,11 +15,11 @@ class AuthRepositoryImpl implements AuthRepository {
         email: email,
         password: password,
       );
-      
+
       if (response.user == null) {
         throw const ServerException('Login failed');
       }
-      
+
       return UserModel.fromSupabaseUser(response.user!);
     } on AuthException catch (e) {
       throw ServerException(e.message);
@@ -36,11 +36,11 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
         data: {'name': name},
       );
-      
+
       if (response.user == null) {
         throw const ServerException('Registration failed');
       }
-      
+
       return UserModel.fromSupabaseUser(response.user!);
     } on AuthException catch (e) {
       throw ServerException(e.message);
