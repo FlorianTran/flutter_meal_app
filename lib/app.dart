@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'features/auth/presentation/pages/login_page.dart';
-import 'features/auth/presentation/pages/home_screen.dart';
 import 'features/auth/presentation/notifier/auth_notifier.dart';
+import 'features/meals/presentation/pages/home_page.dart';
+import 'core/theme/app_theme.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -11,13 +12,22 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authNotifierProvider);
 
+    // Show loading indicator while checking auth state
+    if (authState.isLoading) {
+      return MaterialApp(
+        title: 'Meal App',
+        theme: AppTheme.lightTheme,
+        home: const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        debugShowCheckedModeBanner: false,
+      );
+    }
+
     return MaterialApp(
-      title: 'flutter_meal_app',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
-      home: authState.isAuthenticated ? const HomeScreen() : const LoginPage(),
+      title: 'Meal App',
+      theme: AppTheme.lightTheme,
+      home: authState.isAuthenticated ? const HomePage() : const LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }
