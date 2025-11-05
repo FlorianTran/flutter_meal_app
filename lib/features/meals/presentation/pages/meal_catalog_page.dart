@@ -213,8 +213,12 @@ class _MealCatalogPageState extends ConsumerState<MealCatalogPage> {
             child: MealCard(
               meal: meal,
               onTap: () {
-                // TODO: Navigate to meal details
-                // Navigator.push(context, MealDetailsPage.route(mealId: meal.id));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MealDetailsPage(mealId: meal.id),
+                  ),
+                );
               },
             ),
           );
