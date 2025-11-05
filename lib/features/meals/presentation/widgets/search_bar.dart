@@ -21,6 +21,7 @@ class MealSearchBar extends StatefulWidget {
 
 class _MealSearchBarState extends State<MealSearchBar> {
   late final TextEditingController _controller;
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -32,8 +33,25 @@ class _MealSearchBarState extends State<MealSearchBar> {
   }
 
   @override
+  void didUpdateWidget(MealSearchBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Only update controller when initialValue changes externally (e.g., when filter clears search)
+    // Don't update while user is typing to preserve focus
+    if (widget.initialValue != oldWidget.initialValue &&
+        !_focusNode.hasFocus &&
+        widget.initialValue != _controller.text) {
+      if (widget.initialValue == null || widget.initialValue!.isEmpty) {
+        _controller.clear();
+      } else {
+        _controller.text = widget.initialValue!;
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -54,6 +72,7 @@ class _MealSearchBarState extends State<MealSearchBar> {
       ),
       child: TextField(
         controller: _controller,
+        focusNode: _focusNode,
         decoration: InputDecoration(
           hintText: widget.hintText,
           prefixIcon: const Icon(Icons.search, color: Colors.grey),

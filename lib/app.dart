@@ -12,6 +12,18 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authNotifierProvider);
 
+    // Show loading indicator while checking auth state
+    if (authState.isLoading) {
+      return MaterialApp(
+        title: 'Meal App',
+        theme: AppTheme.lightTheme,
+        home: const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        debugShowCheckedModeBanner: false,
+      );
+    }
+
     return MaterialApp(
       title: 'Meal App',
       theme: AppTheme.lightTheme,

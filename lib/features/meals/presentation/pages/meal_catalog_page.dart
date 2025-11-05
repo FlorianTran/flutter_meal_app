@@ -38,6 +38,9 @@ class _MealCatalogPageState extends ConsumerState<MealCatalogPage> {
         ref
             .read(mealCatalogNotifierProvider.notifier)
             .loadMealsByArea(widget.initialArea!);
+      } else {
+        // If no initial filter, load all meals (from multiple categories)
+        ref.read(mealCatalogNotifierProvider.notifier).loadAllMeals();
       }
     });
   }
@@ -74,6 +77,8 @@ class _MealCatalogPageState extends ConsumerState<MealCatalogPage> {
         children: [
           // Search bar
           MealSearchBar(
+            key: const ValueKey(
+                'meal_search_bar'), // Stable key to prevent rebuilds
             initialValue: catalogState.searchQuery,
             onChanged: (query) {
               ref.read(mealCatalogNotifierProvider.notifier).search(query);
@@ -89,9 +94,15 @@ class _MealCatalogPageState extends ConsumerState<MealCatalogPage> {
               items: homeState.categories.map((c) => c.name).toList(),
               selectedItem: catalogState.selectedCategory,
               onItemSelected: (category) {
-                ref
-                    .read(mealCatalogNotifierProvider.notifier)
-                    .loadMealsByCategory(category);
+                // Toggle: if clicking the same category, clear filter
+                if (catalogState.selectedCategory == category) {
+                  ref.read(mealCatalogNotifierProvider.notifier).clearFilters();
+                } else {
+                  // Clear search when applying filter
+                  ref
+                      .read(mealCatalogNotifierProvider.notifier)
+                      .loadMealsByCategory(category);
+                }
               },
             ),
 

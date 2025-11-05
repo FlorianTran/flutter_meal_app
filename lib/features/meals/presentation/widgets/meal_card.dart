@@ -116,13 +116,25 @@ class MealCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '${meal.ingredients.length} ingredients',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
+                      // Show ingredient count only if ingredients are available
+                      // Filter endpoint returns simplified meals without ingredients
+                      if (meal.ingredients.isNotEmpty)
+                        Text(
+                          '${meal.ingredients.length} ingredients',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        )
+                      else
+                        Text(
+                          'Tap to view details',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[500],
+                            fontStyle: FontStyle.italic,
+                          ),
                         ),
-                      ),
                       Icon(
                         isFavorite ? Icons.star : Icons.star_border,
                         color: isFavorite ? Colors.amber : Colors.grey,

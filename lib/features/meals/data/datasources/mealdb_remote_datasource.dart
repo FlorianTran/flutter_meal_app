@@ -208,6 +208,8 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
         return [];
       }
 
+      // Filter endpoint returns simplified meals (id, name, image only)
+      // We'll fetch full details for each meal in the background
       return meals
           .map((meal) => MealModel.fromJson(meal as Map<String, dynamic>))
           .toList();
@@ -228,6 +230,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
         return [];
       }
 
+      // Filter endpoint returns simplified meals (id, name, image only)
       return meals
           .map((meal) => MealModel.fromJson(meal as Map<String, dynamic>))
           .toList();
@@ -248,6 +251,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
         return [];
       }
 
+      // Filter endpoint returns simplified meals (id, name, image only)
       return meals
           .map((meal) => MealModel.fromJson(meal as Map<String, dynamic>))
           .toList();

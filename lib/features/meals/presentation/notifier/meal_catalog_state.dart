@@ -28,13 +28,16 @@ class MealCatalogState {
     String? searchQuery,
     String? error,
     bool? isGridView,
+    bool clearSelectedCategory = false,
+    bool clearSelectedArea = false,
+    bool clearSearchQuery = false,
   }) {
     return MealCatalogState(
       isLoading: isLoading ?? this.isLoading,
       meals: meals ?? this.meals,
-      selectedCategory: selectedCategory ?? this.selectedCategory,
-      selectedArea: selectedArea ?? this.selectedArea,
-      searchQuery: searchQuery ?? this.searchQuery,
+      selectedCategory: clearSelectedCategory ? null : (selectedCategory ?? this.selectedCategory),
+      selectedArea: clearSelectedArea ? null : (selectedArea ?? this.selectedArea),
+      searchQuery: clearSearchQuery ? null : (searchQuery ?? this.searchQuery),
       error: error,
       isGridView: isGridView ?? this.isGridView,
     );
