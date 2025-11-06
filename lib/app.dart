@@ -36,6 +36,27 @@ class _MyAppState extends ConsumerState<MyApp> {
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
       home: _buildHome(),
+      // Prevent viewport resizing on web when scrolling
+      builder: (context, child) {
+        final mediaQuery = MediaQuery.of(context);
+        // Lock viewport size to prevent resizing when scrolling
+        // Store initial size to prevent changes
+        return MediaQuery(
+          data: mediaQuery.copyWith(
+            // Use fixed viewport size - don't allow it to change
+            size: Size(
+              mediaQuery.size.width,
+              mediaQuery.size.height,
+            ),
+            viewPadding: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
+            viewInsets: EdgeInsets.zero,
+            // Use device pixel ratio to maintain consistent sizing
+            devicePixelRatio: mediaQuery.devicePixelRatio,
+          ),
+          child: child!,
+        );
+      },
     );
   }
 

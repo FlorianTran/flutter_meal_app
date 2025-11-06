@@ -1,8 +1,21 @@
-import 'package:flutter_meal_app/core/error/failures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_meal_app/features/meals/di/meals_injection.dart';
 import 'package:flutter_meal_app/features/meals/domain/entities/meal.dart';
 import 'package:flutter_meal_app/features/meals/presentation/notifier/ingredients_selection_notifier.dart';
+
+/// Provider to pre-load all meals when the ingredients page opens
+/// This ensures meals are available immediately when ingredients are selected
+final allMealsPreloadProvider =
+    FutureProvider.autoDispose<List<Meal>>((ref) async {
+  final getAllMeals2 = ref.watch(getAllMeals2UseCaseProvider);
+  final result = await getAllMeals2();
+
+  if (result.failure != null) {
+    throw result.failure!;
+  }
+
+  return result.meals ?? [];
+});
 
 final matchingMealsProvider =
     FutureProvider.autoDispose<List<Meal>>((ref) async {
@@ -13,17 +26,19 @@ final matchingMealsProvider =
     return [];
   }
 
-  final (:failure, :meals, :possibleNextIngredients) = await ref
-        .watch(findMatchingMealsExhaustiveUseCaseProvider)
-        .call(selectedIngredients);
+  // Pre-load all meals if not already loaded
+  final allMeals = await ref.watch(allMealsPreloadProvider.future);
 
-  if (failure != null) {
-    throw failure;
-  }
+  // Filter meals that contain all selected ingredients
+  final matchingMeals = allMeals.where((meal) {
+    final mealIngredients =
+        meal.ingredients.map((e) => e.name.toLowerCase()).toSet();
+    return selectedIngredients
+        .every((selected) => mealIngredients.contains(selected.toLowerCase()));
+  }).toList();
 
-  return meals ?? [];
+  return matchingMeals;
 });
-
 
 final allIngredientsFromMatchingMealsProvider =
     Provider.autoDispose<List<String>>((ref) {
