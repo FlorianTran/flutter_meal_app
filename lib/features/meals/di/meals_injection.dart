@@ -1,4 +1,3 @@
-
 import 'package:flutter_meal_app/features/meals/domain/usecases/get_all_meals_2.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -16,6 +15,7 @@ import 'package:flutter_meal_app/features/meals/domain/usecases/get_meal_of_day.
 import 'package:flutter_meal_app/features/meals/domain/usecases/get_meals_by_area.dart';
 import 'package:flutter_meal_app/features/meals/domain/usecases/get_meals_by_category.dart';
 import 'package:flutter_meal_app/features/meals/domain/usecases/search_meals.dart';
+import 'package:flutter_meal_app/features/meals/domain/usecases/get_similar_meals.dart';
 import 'package:flutter_meal_app/features/meals/presentation/notifier/ingredients_selection_notifier.dart';
 import 'package:flutter_meal_app/features/meals/data/datasources/mealdb_local_data_source.dart';
 
@@ -28,7 +28,8 @@ final networkInfoProvider = Provider<NetworkInfo>((ref) => NetworkInfo());
 
 // Data Layer
 final mealDBRemoteDataSourceProvider = Provider<MealDbRemoteDataSource>((ref) {
-  return MealDbRemoteDataSourceImpl(apiClient: ref.watch(mealDbApiClientProvider));
+  return MealDbRemoteDataSourceImpl(
+      apiClient: ref.watch(mealDbApiClientProvider));
 });
 
 final mealDBLocalDataSourceProvider = Provider<MealDbLocalDataSource>((ref) {
@@ -55,7 +56,6 @@ final findMatchingMealsExhaustiveUseCaseProvider =
     ref.watch(getAllMeals2UseCaseProvider),
   );
 });
-
 
 final getAllMealsUseCaseProvider = Provider<GetAllMeals>((ref) {
   return GetAllMeals(ref.watch(mealsRepositoryProvider));
@@ -89,22 +89,28 @@ final searchMealsUseCaseProvider = Provider<SearchMeals>((ref) {
   return SearchMeals(ref.watch(mealsRepositoryProvider));
 });
 
+final getSimilarMealsUseCaseProvider = Provider<GetSimilarMeals>((ref) {
+  return GetSimilarMeals(ref.watch(mealsRepositoryProvider));
+});
+
 // --- UI-facing Providers ---
 
 /// Provider to fetch the list of all ingredient names.
-final allIngredientsProvider = FutureProvider.autoDispose<List<String>>((ref) async {
+final allIngredientsProvider =
+    FutureProvider.autoDispose<List<String>>((ref) async {
   final getAllIngredients = ref.watch(getAllIngredientsUseCaseProvider);
   final result = await getAllIngredients();
-  
+
   if (result.failure != null) {
     throw result.failure!;
   }
-  
+
   return result.ingredientNames ?? [];
 });
 
 /// Provider to filter available ingredients based on the current selection.
-final availableIngredientsProvider = FutureProvider.autoDispose<List<String>>((ref) async {
+final availableIngredientsProvider =
+    FutureProvider.autoDispose<List<String>>((ref) async {
   final selectedIngredients = ref.watch(ingredientsSelectionNotifierProvider);
   final getAllMeals = ref.watch(getAllMealsUseCaseProvider);
 
@@ -123,8 +129,10 @@ final availableIngredientsProvider = FutureProvider.autoDispose<List<String>>((r
 
   // 1. Find meals that contain all selected ingredients.
   final matchingMeals = allMeals.where((meal) {
-    final mealIngredients = meal.ingredients.map((e) => e.name.toLowerCase()).toSet();
-    return selectedIngredients.every((selected) => mealIngredients.contains(selected.toLowerCase()));
+    final mealIngredients =
+        meal.ingredients.map((e) => e.name.toLowerCase()).toSet();
+    return selectedIngredients
+        .every((selected) => mealIngredients.contains(selected.toLowerCase()));
   }).toList();
 
   // 2. From those meals, get all their ingredients.
@@ -132,7 +140,7 @@ final availableIngredientsProvider = FutureProvider.autoDispose<List<String>>((r
       .expand((meal) => meal.ingredients.map((e) => e.name))
       .toSet()
       .toList();
-      
+
   // 3. Sort the ingredients alphabetically.
   availableIngredients.sort();
 
@@ -140,7 +148,8 @@ final availableIngredientsProvider = FutureProvider.autoDispose<List<String>>((r
 });
 
 /// New, independent provider for the ingredient selection page logic.
-final ingredientFilterLogicProvider = FutureProvider.autoDispose<List<String>>((ref) async {
+final ingredientFilterLogicProvider =
+    FutureProvider.autoDispose<List<String>>((ref) async {
   final selectedIngredients = ref.watch(ingredientsSelectionNotifierProvider);
   final allIngredientsFuture = ref.watch(allIngredientsProvider.future);
 
@@ -159,8 +168,10 @@ final ingredientFilterLogicProvider = FutureProvider.autoDispose<List<String>>((
 
   // Find meals that contain ALL selected ingredients.
   final matchingMeals = allMeals.where((meal) {
-    final mealIngredients = meal.ingredients.map((e) => e.name.toLowerCase()).toSet();
-    return selectedIngredients.every((selected) => mealIngredients.contains(selected.toLowerCase()));
+    final mealIngredients =
+        meal.ingredients.map((e) => e.name.toLowerCase()).toSet();
+    return selectedIngredients
+        .every((selected) => mealIngredients.contains(selected.toLowerCase()));
   }).toList();
 
   // If no meals match, it means the user has selected an impossible combination.
