@@ -60,7 +60,7 @@ class FindMatchingMealsExhaustive {
       }
     }
 
-    // 4. Trouver les autres ingrédients possibles parmi ces repas
+    // 4. Find other possible ingredients among these meals
     final allMatchingIngredients = matchingMeals
         .expand((meal) => meal.ingredients.map((e) => e.name.toLowerCase()))
         .toSet();
