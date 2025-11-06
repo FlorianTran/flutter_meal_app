@@ -1,19 +1,25 @@
+import 'package:flutter_meal_app/features/meals/di/meals_injection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_meal_app/features/meals/di/meals_injection.dart';
 import 'package:flutter_meal_app/features/meals/presentation/notifier/ingredients_selection_notifier.dart';
 import 'package:flutter_meal_app/features/meals/presentation/notifier/matching_meals_notifier.dart';
 import 'package:flutter_meal_app/features/meals/presentation/widgets/ingredient_card.dart';
 import 'package:flutter_meal_app/features/meals/presentation/widgets/selection_summary_bar.dart';
+import 'matching_meals_page.dart';
 
 final _searchQueryProvider = StateProvider<String>((ref) => '');
 
 class IngredientsSelectionPage extends ConsumerWidget {
+  static Route<void> route() {
+    return MaterialPageRoute(
+      builder: (context) => const IngredientsSelectionPage(),
+    );
+  }
   const IngredientsSelectionPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ingredientsAsync = ref.watch(allIngredientsProvider);
+    final ingredientsAsync = ref.watch(ingredientFilterLogicProvider);
     final selectedIngredients = ref.watch(ingredientsSelectionNotifierProvider);
     final matchingMealsCount = ref.watch(matchingMealsCountProvider);
     final searchQuery = ref.watch(_searchQueryProvider);
@@ -36,6 +42,7 @@ class IngredientsSelectionPage extends ConsumerWidget {
               ),
             ),
           ),
+
           Expanded(
             child: ingredientsAsync.when(
               data: (ingredients) {
@@ -82,7 +89,7 @@ class IngredientsSelectionPage extends ConsumerWidget {
                   children: [
                     const Text('Failed to load ingredients.'),
                     ElevatedButton(
-                      onPressed: () => ref.refresh(allIngredientsProvider),
+                      onPressed: () => ref.refresh(ingredientFilterLogicProvider),
                       child: const Text('Retry'),
                     )
                   ],
@@ -100,7 +107,7 @@ class IngredientsSelectionPage extends ConsumerWidget {
           error: (e, s) => 0,
         ),
         onActionPressed: () {
-          // TODO: Navigate to matching meals page
+          Navigator.push(context, MatchingMealsPage.route());
         },
       ),
     );

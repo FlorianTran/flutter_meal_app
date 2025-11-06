@@ -37,5 +37,6 @@ abstract class MealsRepository {
 
   /// Filter meals by ingredient (single ingredient - free API limitation)
   Future<({Failure? failure, List<Meal>? meals})> getMealsByIngredient(String ingredient);
+  Future<({Failure? failure, List<Meal>? meals})> getAllMeals();
 }
 

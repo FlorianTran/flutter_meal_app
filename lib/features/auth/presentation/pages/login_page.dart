@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../notifier/auth_notifier.dart';
 import '../notifier/auth_state.dart';
-import 'home_screen.dart';
+import '../../../meals/presentation/pages/home_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -22,10 +22,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     ref.listen<AuthState>(authNotifierProvider, (previous, next) {
       if (next.isAuthenticated) {
-        print('Login successful! Navigating to Home Screen.');
+// print('Login button pressed');
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const HomeScreen(),
+            builder: (context) => const HomePage(),
           ),
         );
       }
@@ -123,7 +123,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (_formKey.currentState!.validate()) {
       final email = _emailController.text.trim();
       final password = _passwordController.text;
-      
+
       ref.read(authNotifierProvider.notifier).login(email, password);
     }
   }
