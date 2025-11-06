@@ -172,7 +172,7 @@ class MealDetailsPage extends ConsumerWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withOpacity(0.1),
+                      color: AppTheme.primaryGreen.withAlpha((255 * 0.6).round()),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(

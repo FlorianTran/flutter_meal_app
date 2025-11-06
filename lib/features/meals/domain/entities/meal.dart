@@ -1,3 +1,5 @@
+import 'package:flutter_meal_app/features/meals/domain/entities/ingredient.dart';
+
 /// Meal entity representing a recipe
 class Meal {
   final String id;
@@ -6,12 +8,12 @@ class Meal {
   final String? category;
   final String? area;
   final String? instructions;
-  final List<MealIngredient> ingredients;
+  final List<Ingredient> ingredients;
   final String? youtubeUrl;
   final String? sourceUrl;
   final String? thumbnailUrl;
 
-  Meal({
+  const Meal({
     required this.id,
     required this.name,
     this.image,
@@ -32,26 +34,4 @@ class Meal {
 
   @override
   int get hashCode => id.hashCode;
-}
-
-/// Meal ingredient with measurement
-class MealIngredient {
-  final String name;
-  final String? measurement;
-
-  MealIngredient({
-    required this.name,
-    this.measurement,
-  });
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is MealIngredient &&
-        other.name == name &&
-        other.measurement == measurement;
-  }
-
-  @override
-  int get hashCode => Object.hash(name, measurement);
 }

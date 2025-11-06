@@ -1,3 +1,4 @@
+import 'package:flutter_meal_app/features/meals/data/datasources/mealdb_local_data_source.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/usecases/get_categories.dart';
 import '../../data/repositories_impl/meals_repository_impl.dart';
@@ -40,7 +41,8 @@ final homeNotifierProvider =
     StateNotifierProvider<HomeNotifier, HomeState>((ref) {
   final apiClient = MealDbApiClient(baseUrl: AppConstants.mealdbApiUrl);
   final remoteDataSource = MealDbRemoteDataSourceImpl(apiClient: apiClient);
-  final repository = MealsRepositoryImpl(remoteDataSource: remoteDataSource);
+  final localDataSource = MealDbLocalDataSourceImpl();
+  final repository = MealsRepositoryImpl(remoteDataSource: remoteDataSource, localDataSource: localDataSource);
   final getCategories = GetCategories(repository);
 
   return HomeNotifier(getCategories: getCategories);

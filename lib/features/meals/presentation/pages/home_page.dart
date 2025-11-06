@@ -9,6 +9,7 @@ import '../widgets/meal_of_day_card.dart';
 import '../widgets/category_list.dart';
 import 'meal_catalog_page.dart';
 import 'meal_details_page.dart';
+import 'ingredients_selection_page.dart';
 
 /// Home page based on Figma design
 class HomePage extends ConsumerStatefulWidget {
@@ -182,7 +183,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             child: ElevatedButton(
               onPressed: () {
                 // TODO: Navigate to ingredients selection page
-                // Navigator.push(context, IngredientsSelectionPage.route());
+                Navigator.push(context, IngredientsSelectionPage.route());
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryGreen,
@@ -292,7 +293,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha((255 * 0.7).round()),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

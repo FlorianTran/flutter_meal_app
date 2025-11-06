@@ -5,30 +5,51 @@ import 'features/auth/presentation/notifier/auth_notifier.dart';
 import 'features/meals/presentation/pages/home_page.dart';
 import 'core/theme/app_theme.dart';
 
-class MyApp extends ConsumerWidget {
+import 'features/splash_screen/presentation/pages/splash_screen_page.dart';
+
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authNotifierProvider);
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
 
-    // Show loading indicator while checking auth state
-    if (authState.isLoading) {
-      return MaterialApp(
-        title: 'Meal App',
-        theme: AppTheme.lightTheme,
-        home: const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
-        debugShowCheckedModeBanner: false,
-      );
-    }
+class _MyAppState extends ConsumerState<MyApp> {
+  bool _showSplash = true;
 
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) {
+        setState(() {
+          _showSplash = false;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Meal App',
       theme: AppTheme.lightTheme,
-      home: authState.isAuthenticated ? const HomePage() : const LoginPage(),
       debugShowCheckedModeBanner: false,
+      home: _buildHome(),
     );
+  }
+
+  Widget _buildHome() {
+    if (_showSplash) {
+      return const SplashScreenPage();
+    }
+
+    final authState = ref.watch(authNotifierProvider);
+
+    if (authState.isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    return authState.isAuthenticated ? const HomePage() : const LoginPage();
   }
 }

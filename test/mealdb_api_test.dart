@@ -3,7 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_meal_app/core/network/mealdb_api_client.dart';
 import 'package:flutter_meal_app/features/meals/data/models/meal_model.dart';
 import 'package:flutter_meal_app/features/meals/data/models/category_model.dart';
-import 'package:flutter_meal_app/features/meals/data/models/ingredient_model.dart';
+
 
 void main() {
   group('MealDB API Client - Phase 0 Tests', () {

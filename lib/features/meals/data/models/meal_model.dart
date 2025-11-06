@@ -1,3 +1,5 @@
+import 'package:flutter_meal_app/features/meals/domain/entities/ingredient.dart';
+
 import '../../domain/entities/meal.dart';
 
 /// Meal data model
@@ -16,57 +18,61 @@ class MealModel extends Meal {
   });
 
   factory MealModel.fromJson(Map<String, dynamic> json) {
-    // MealDB API returns meal data as a Map
-    final mealData = json;
+    final ingredients = <Ingredient>[];
 
-    final ingredients = <MealIngredient>[];
+    // Check if ingredients are already parsed (from cache)
+    if (json.containsKey('ingredients') && json['ingredients'] is List) {
+      final ingredientsData = json['ingredients'] as List;
+      for (final ingredientJson in ingredientsData) {
+        if (ingredientJson is Map<String, dynamic>) {
+          ingredients.add(Ingredient(
+            name: ingredientJson['name'] ?? '',
+            measurement: ingredientJson['measurement'],
+          ));
+        }
+      }
+    } else {
+      // Fallback to parsing from strIngredient1-20 (from API)
+      for (int i = 1; i <= 20; i++) {
+        final ingredientName = json['strIngredient$i'] as String?;
+        final measure = json['strMeasure$i'] as String?;
 
-    // Extract ingredients from strIngredient1-20 and strMeasure1-20
-    for (int i = 1; i <= 20; i++) {
-      final ingredientName = mealData['strIngredient$i'] as String?;
-      final measure = mealData['strMeasure$i'] as String?;
-
-      if (ingredientName != null && ingredientName.trim().isNotEmpty) {
-        ingredients.add(MealIngredient(
-          name: ingredientName.trim(),
-          measurement: measure?.trim(),
-        ));
+        if (ingredientName != null && ingredientName.trim().isNotEmpty) {
+          ingredients.add(Ingredient(
+            name: ingredientName.trim(),
+            measurement: measure?.trim(),
+          ));
+        }
       }
     }
 
     return MealModel(
-      id: mealData['idMeal']?.toString() ?? '',
-      name: mealData['strMeal']?.toString() ?? '',
-      image: mealData['strMealThumb']?.toString(),
-      category: mealData['strCategory']?.toString(),
-      area: mealData['strArea']?.toString(),
-      instructions: mealData['strInstructions']?.toString(),
+      id: json['idMeal']?.toString() ?? '',
+      name: json['strMeal']?.toString() ?? '',
+      image: json['strMealThumb']?.toString(),
+      category: json['strCategory']?.toString(),
+      area: json['strArea']?.toString(),
+      instructions: json['strInstructions']?.toString(),
       ingredients: ingredients,
-      youtubeUrl: mealData['strYoutube']?.toString(),
-      sourceUrl: mealData['strSource']?.toString(),
-      thumbnailUrl: mealData['strMealThumb']?.toString(),
+      youtubeUrl: json['strYoutube']?.toString(),
+      sourceUrl: json['strSource']?.toString(),
+      thumbnailUrl: json['strMealThumb']?.toString(),
     );
   }
 
-  /// Create MealModel from MealDB API response
-  /// API returns: {"meals": [...]} or {"meals": null}
-  factory MealModel.fromMealDbJson(Map<String, dynamic> json) {
-    final meals = json['meals'];
-    if (meals == null || meals.isEmpty) {
-      throw Exception('No meals found in response');
+  /// Parses a list of meals from a MealDB API JSON response.
+  /// The API returns a map with a 'meals' key, which can be a list of meal objects.
+  static List<MealModel> parseMealsListFromJson(Map<String, dynamic> json) {
+    final mealsData = json['meals'];
+
+    if (mealsData is List) {
+      return mealsData
+          .map((mealJson) => MealModel.fromJson(mealJson as Map<String, dynamic>))
+          .toList();
     }
 
-    // Handle single meal object
-    if (meals is Map<String, dynamic>) {
-      return MealModel.fromJson(meals);
-    }
-
-    // Handle list of meals
-    if (meals is List && meals.isNotEmpty) {
-      return MealModel.fromJson(meals.first);
-    }
-
-    throw Exception('Invalid meals format in response');
+    // Return an empty list if 'meals' is null or not a list
+    return [];
   }
 
   Map<String, dynamic> toJson() {
@@ -79,6 +85,10 @@ class MealModel extends Meal {
       'strInstructions': instructions,
       'strYoutube': youtubeUrl,
       'strSource': sourceUrl,
+      // Serialize ingredients
+      'ingredients': ingredients
+          .map((i) => {'name': i.name, 'measurement': i.measurement})
+          .toList(),
     };
   }
 

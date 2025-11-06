@@ -1,3 +1,4 @@
+
 import '../../../../core/network/mealdb_api_client.dart';
 import '../../../../core/error/exceptions.dart';
 import '../models/meal_model.dart';
@@ -16,6 +17,7 @@ abstract class MealDbRemoteDataSource {
   Future<List<MealModel>> getMealsByCategory(String category);
   Future<List<MealModel>> getMealsByArea(String area);
   Future<List<MealModel>> getMealsByIngredient(String ingredient);
+  Future<List<MealModel>> getAllMeals();
 }
 
 class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
@@ -33,7 +35,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
         throw const ServerException('No meal found');
       }
 
-      return MealModel.fromMealDbJson(response);
+      return MealModel.fromJson(meals.first as Map<String, dynamic>);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -51,7 +53,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
         throw ServerException('Meal with id $id not found');
       }
 
-      return MealModel.fromMealDbJson(response);
+      return MealModel.fromJson(meals.first as Map<String, dynamic>);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -63,15 +65,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
   Future<List<MealModel>> searchMeals(String query) async {
     try {
       final response = await apiClient.searchMeals(query);
-      final meals = response['meals'] as List?;
-
-      if (meals == null) {
-        return [];
-      }
-
-      return meals
-          .map((meal) => MealModel.fromJson(meal as Map<String, dynamic>))
-          .toList();
+      return MealModel.parseMealsListFromJson(response);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -83,15 +77,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
   Future<List<MealModel>> searchMealsByLetter(String letter) async {
     try {
       final response = await apiClient.searchMealsByLetter(letter);
-      final meals = response['meals'] as List?;
-
-      if (meals == null) {
-        return [];
-      }
-
-      return meals
-          .map((meal) => MealModel.fromJson(meal as Map<String, dynamic>))
-          .toList();
+      return MealModel.parseMealsListFromJson(response);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -202,17 +188,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
   Future<List<MealModel>> getMealsByCategory(String category) async {
     try {
       final response = await apiClient.filterByCategory(category);
-      final meals = response['meals'] as List?;
-
-      if (meals == null) {
-        return [];
-      }
-
-      // Filter endpoint returns simplified meals (id, name, image only)
-      // We'll fetch full details for each meal in the background
-      return meals
-          .map((meal) => MealModel.fromJson(meal as Map<String, dynamic>))
-          .toList();
+      return MealModel.parseMealsListFromJson(response);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -224,16 +200,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
   Future<List<MealModel>> getMealsByArea(String area) async {
     try {
       final response = await apiClient.filterByArea(area);
-      final meals = response['meals'] as List?;
-
-      if (meals == null) {
-        return [];
-      }
-
-      // Filter endpoint returns simplified meals (id, name, image only)
-      return meals
-          .map((meal) => MealModel.fromJson(meal as Map<String, dynamic>))
-          .toList();
+      return MealModel.parseMealsListFromJson(response);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -245,20 +212,49 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
   Future<List<MealModel>> getMealsByIngredient(String ingredient) async {
     try {
       final response = await apiClient.filterByIngredient(ingredient);
-      final meals = response['meals'] as List?;
-
-      if (meals == null) {
-        return [];
-      }
-
-      // Filter endpoint returns simplified meals (id, name, image only)
-      return meals
-          .map((meal) => MealModel.fromJson(meal as Map<String, dynamic>))
-          .toList();
+      return MealModel.parseMealsListFromJson(response);
     } on ServerException {
       rethrow;
     } catch (e) {
       throw ServerException('Failed to get meals by ingredient: $e');
     }
+  }
+
+  @override
+  Future<List<MealModel>> getAllMeals() async {
+    const letters = 'abcdefghijklmnopqrstuvwxyz';
+    final allMeals = <MealModel>[];
+    final seenIds = <String>{};
+
+    for (final letter in letters.split('')) {
+      try {
+        final jsonData = await apiClient.get(
+          '/search.php',
+          queryParameters: {'f': letter},
+        );
+
+        final meals = MealModel.parseMealsListFromJson(jsonData);
+        if (meals.isEmpty) continue;
+
+        for (final meal in meals) {
+          if (!seenIds.contains(meal.id)) {
+            seenIds.add(meal.id);
+            allMeals.add(meal);
+          }
+        }
+      } catch (e) {
+        // In case of error on a letter, continue with the next ones
+        print('Erreur lors du chargement des plats de la lettre $letter : $e');
+      }
+
+      // Avoid API rate-limit
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+
+    if (allMeals.isEmpty) {
+      throw const ServerException('No meals found in TheMealDB');
+    }
+
+    return allMeals;
   }
 }

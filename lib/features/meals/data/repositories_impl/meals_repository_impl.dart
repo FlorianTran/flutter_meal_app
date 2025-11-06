@@ -1,3 +1,5 @@
+import 'package:flutter_meal_app/features/meals/data/datasources/mealdb_local_data_source.dart';
+
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../domain/repositories/meals_repository.dart';
@@ -9,8 +11,12 @@ import '../datasources/mealdb_remote_datasource.dart';
 /// Converts exceptions from data source to failures for domain layer
 class MealsRepositoryImpl implements MealsRepository {
   final MealDbRemoteDataSource remoteDataSource;
+  final MealDbLocalDataSource localDataSource;
 
-  MealsRepositoryImpl({required this.remoteDataSource});
+  MealsRepositoryImpl({
+    required this.remoteDataSource,
+    required this.localDataSource,
+  });
 
   @override
   Future<({Failure? failure, Meal? meal})> getMealOfDay() async {
@@ -161,6 +167,31 @@ class MealsRepositoryImpl implements MealsRepository {
       return (failure: null, meals: meals);
     } on ServerException catch (e) {
       return (failure: ServerFailure(e.message), meals: null);
+    } catch (e) {
+      return (failure: ServerFailure('Unexpected error: $e'), meals: null);
+    }
+  }
+
+  @override
+  Future<({Failure? failure, List<Meal>? meals})> getAllMeals() async {
+    try {
+      // 1. Check the cache
+      final cached = await localDataSource.getCachedMeals();
+      if (cached != null && cached.isNotEmpty) {
+        return (failure: null, meals: cached.map((m) => m.toEntity()).toList());
+      }
+
+      // 2. Sinon appelle le remote
+      final remoteMeals = await remoteDataSource.getAllMeals();
+
+      // 3. Stocke en cache pour les prochains appels
+      await localDataSource.cacheMeals(remoteMeals);
+
+      return (failure: null, meals: remoteMeals.map((m) => m.toEntity()).toList());
+    } on ServerException catch (e) {
+      return (failure: ServerFailure(e.message), meals: null);
+    } on CacheException catch (e) {
+      return (failure: CacheFailure(e.message), meals: null);
     } catch (e) {
       return (failure: ServerFailure('Unexpected error: $e'), meals: null);
     }

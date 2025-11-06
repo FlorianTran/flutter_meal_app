@@ -27,7 +27,7 @@ class MealOfDayCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withAlpha((255 * 0.1).round()),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -72,7 +72,7 @@ class MealOfDayCard extends StatelessWidget {
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                       colors: [
-                        Colors.black.withOpacity(0.8),
+                        Colors.black.withAlpha((255 * 0.8).round()),
                         Colors.transparent,
                       ],
                     ),
@@ -87,7 +87,7 @@ class MealOfDayCard extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withAlpha((255 * 0.9).round()),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -126,7 +126,7 @@ class MealOfDayCard extends StatelessWidget {
                             Text(
                               '${meal.ingredients.length} ingredients',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withAlpha((255 * 0.9).round()),
                                 fontSize: 14,
                               ),
                             ),

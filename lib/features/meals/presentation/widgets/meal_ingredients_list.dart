@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_meal_app/features/meals/domain/entities/ingredient.dart';
 import '../../domain/entities/meal.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -45,7 +46,7 @@ class MealIngredientsList extends StatelessWidget {
 }
 
 class _IngredientItem extends StatelessWidget {
-  final MealIngredient ingredient;
+  final Ingredient ingredient;
   final bool isSelected;
 
   const _IngredientItem({
@@ -60,7 +61,7 @@ class _IngredientItem extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isSelected
-            ? AppTheme.primaryGreen.withOpacity(0.1)
+            ? AppTheme.primaryGreen.withAlpha((255 * 0.05).round())
             : Colors.grey[100],
         borderRadius: BorderRadius.circular(8),
         border: isSelected

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_meal_app/features/meals/data/datasources/mealdb_local_data_source.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/meal.dart';
 import '../../domain/usecases/get_meals_by_category.dart';
@@ -244,7 +245,8 @@ final mealCatalogNotifierProvider =
     StateNotifierProvider<MealCatalogNotifier, MealCatalogState>((ref) {
   final apiClient = MealDbApiClient(baseUrl: AppConstants.mealdbApiUrl);
   final remoteDataSource = MealDbRemoteDataSourceImpl(apiClient: apiClient);
-  final repository = MealsRepositoryImpl(remoteDataSource: remoteDataSource);
+  final localDataSource = MealDbLocalDataSourceImpl();
+  final repository = MealsRepositoryImpl(remoteDataSource: remoteDataSource, localDataSource: localDataSource);
   final getMealsByCategory = GetMealsByCategory(repository);
   final getMealsByArea = GetMealsByArea(repository);
   final searchMeals = SearchMeals(repository);

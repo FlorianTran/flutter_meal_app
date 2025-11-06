@@ -27,6 +27,7 @@ dependencies:
   url_launcher: ^6.2.2
   # Share functionality
   share_plus: ^7.2.1
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
