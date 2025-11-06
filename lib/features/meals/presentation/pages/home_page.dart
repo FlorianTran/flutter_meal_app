@@ -7,9 +7,12 @@ import '../notifier/meal_of_day_notifier.dart';
 import '../notifier/meal_of_day_state.dart';
 import '../widgets/meal_of_day_card.dart';
 import '../widgets/category_list.dart';
+import '../widgets/meal_card.dart';
+import '../notifier/recently_viewed_notifier.dart';
 import 'meal_catalog_page.dart';
 import 'meal_details_page.dart';
 import 'ingredients_selection_page.dart';
+import 'recently_viewed_page.dart';
 
 /// Home page based on Figma design
 class HomePage extends ConsumerStatefulWidget {
@@ -73,6 +76,11 @@ class _HomePageState extends ConsumerState<HomePage> {
 
                 // Categories Section
                 _buildCategoriesSection(homeState),
+
+                const SizedBox(height: 32),
+
+                // Recently Viewed Section
+                _buildRecentlyViewedSection(),
 
                 const SizedBox(height: 100), // Space for bottom navigation
               ],
@@ -347,6 +355,75 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildRecentlyViewedSection() {
+    final state = ref.watch(recentlyViewedNotifierProvider);
+
+    if (state.isLoading || state.meals.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    // Show only first 5 recently viewed meals
+    final recentMeals = state.meals.take(5).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Recently Viewed',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(context, RecentlyViewedPage.route());
+                },
+                child: const Text('See All'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: recentMeals.length,
+            itemBuilder: (context, index) {
+              final meal = recentMeals[index];
+              return SizedBox(
+                width: 160,
+                height: 200,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: MealCard(
+                    meal: meal,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              MealDetailsPage(mealId: meal.id),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

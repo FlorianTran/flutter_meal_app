@@ -34,6 +34,7 @@ class MealCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             // Meal image
             ClipRRect(
@@ -62,87 +63,102 @@ class MealCard extends StatelessWidget {
                       ),
               ),
             ),
-            // Meal info
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    meal.name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+            // Meal info - Flexible to prevent overflow
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      meal.name,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  if (meal.category != null || meal.area != null)
-                    Row(
-                      children: [
-                        if (meal.category != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryGreen.withAlpha((255 * 0.1).round()),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              meal.category!,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppTheme.primaryGreen,
-                                fontWeight: FontWeight.w500,
+                    const SizedBox(height: 4),
+                    if (meal.category != null || meal.area != null)
+                      Row(
+                        children: [
+                          if (meal.category != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppTheme.primaryGreen
+                                    .withAlpha((255 * 0.1).round()),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                meal.category!,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: AppTheme.primaryGreen,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                          ),
-                        if (meal.category != null && meal.area != null)
-                          const SizedBox(width: 8),
-                        if (meal.area != null)
-                          Text(
-                            meal.area!,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
+                          if (meal.category != null && meal.area != null)
+                            const SizedBox(width: 6),
+                          if (meal.area != null)
+                            Flexible(
+                              child: Text(
+                                meal.area!,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey[600],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Show ingredient count only if ingredients are available
+                        // Filter endpoint returns simplified meals without ingredients
+                        Flexible(
+                          child: meal.ingredients.isNotEmpty
+                              ? Text(
+                                  '${meal.ingredients.length} ingredients',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[600],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )
+                              : Text(
+                                  'Tap to view details',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[500],
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                        ),
+                        Icon(
+                          isFavorite ? Icons.star : Icons.star_border,
+                          color: isFavorite ? Colors.amber : Colors.grey,
+                          size: 18,
+                        ),
                       ],
                     ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Show ingredient count only if ingredients are available
-                      // Filter endpoint returns simplified meals without ingredients
-                      if (meal.ingredients.isNotEmpty)
-                        Text(
-                          '${meal.ingredients.length} ingredients',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                        )
-                      else
-                        Text(
-                          'Tap to view details',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[500],
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      Icon(
-                        isFavorite ? Icons.star : Icons.star_border,
-                        color: isFavorite ? Colors.amber : Colors.grey,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
