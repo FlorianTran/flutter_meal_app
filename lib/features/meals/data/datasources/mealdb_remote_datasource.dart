@@ -243,7 +243,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
           }
         }
       } catch (e) {
-        // En cas d'erreur sur une lettre, on continue avec les suivantes
+        // In case of error on a letter, continue with the next ones
         print('Erreur lors du chargement des plats de la lettre $letter : $e');
       }
 
