@@ -262,4 +262,42 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
 
     return allMeals;
   }
+
+  @override
+  Future<List<MealModel>> getAllMeals() async {
+    const letters = 'abcdefghijklmnopqrstuvwxyz';
+    final allMeals = <MealModel>[];
+    final seenIds = <String>{};
+
+    for (final letter in letters.split('')) {
+      try {
+        final jsonData = await apiClient.get(
+          '/search.php',
+          queryParameters: {'f': letter},
+        );
+
+        final meals = MealModel.parseMealsListFromJson(jsonData);
+        if (meals.isEmpty) continue;
+
+        for (final meal in meals) {
+          if (!seenIds.contains(meal.id)) {
+            seenIds.add(meal.id);
+            allMeals.add(meal);
+          }
+        }
+      } catch (e) {
+        // In case of error on a letter, continue with the next ones
+        print('Erreur lors du chargement des plats de la lettre $letter : $e');
+      }
+
+      // Évite le rate-limit de l’API
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+
+    if (allMeals.isEmpty) {
+      throw const ServerException('No meals found in TheMealDB');
+    }
+
+    return allMeals;
+  }
 }
