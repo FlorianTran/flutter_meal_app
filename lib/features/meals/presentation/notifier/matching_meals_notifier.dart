@@ -17,13 +17,26 @@ final allMealsPreloadProvider =
   return result.meals ?? [];
 });
 
-final matchingMealsProvider =
+/// Provider to pre-load all meals when the ingredients page opens
+/// This ensures meals are available immediately when ingredients are selected
+final allMealsPreloadProvider =
     FutureProvider.autoDispose<List<Meal>>((ref) async {
-  // WATCH instead of READ to ensure this provider re-runs on change.
-  final selectedIngredients = ref.watch(ingredientsSelectionNotifierProvider);
+  final getAllMeals2 = ref.watch(getAllMeals2UseCaseProvider);
+  final result = await getAllMeals2();
 
+  if (result.failure != null) {
+    throw result.failure!;
+  }
+
+  return result.meals ?? [];
+});
+
+/// Provides the count of meals that match the selected ingredients.
+final matchingMealsCountProvider = FutureProvider.autoDispose<int>((ref) async {
+  final selectedIngredients = ref.watch(ingredientsSelectionNotifierProvider);
+  
   if (selectedIngredients.isEmpty) {
-    return [];
+    return 0;
   }
 
   // Pre-load all meals if not already loaded
