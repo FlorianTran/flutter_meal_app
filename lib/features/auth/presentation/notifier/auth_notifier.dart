@@ -16,11 +16,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true);
     try {
       final user = await repository.getCurrentUser();
-      state = state.copyWith(
-        isLoading: false,
-        isAuthenticated: true,
-        userEmail: user.email,
-      );
+      if (user != null) {
+        state = state.copyWith(
+          isLoading: false,
+          isAuthenticated: true,
+          userEmail: user.email,
+        );
+      } else {
+        state = state.copyWith(isLoading: false, isAuthenticated: false);
+      }
     } catch (e) {
       // User is not authenticated, keep default state
       state = state.copyWith(isLoading: false);
