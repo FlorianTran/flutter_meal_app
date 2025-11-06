@@ -75,7 +75,8 @@ final searchNotifierProvider =
   final apiClient = MealDbApiClient(baseUrl: AppConstants.mealdbApiUrl);
   final remoteDataSource = MealDbRemoteDataSourceImpl(apiClient: apiClient);
   final localDataSource = MealDbLocalDataSourceImpl();
-  final repository = MealsRepositoryImpl(remoteDataSource: remoteDataSource, localDataSource: localDataSource);  final searchMeals = SearchMeals(repository);
+  final repository = MealsRepositoryImpl(remoteDataSource: remoteDataSource, localDataSource: localDataSource);
+  final searchMeals = SearchMeals(repository);
 
   return SearchNotifier(searchMeals: searchMeals);
 });

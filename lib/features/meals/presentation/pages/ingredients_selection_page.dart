@@ -15,6 +15,7 @@ class IngredientsSelectionPage extends ConsumerWidget {
       builder: (context) => const IngredientsSelectionPage(),
     );
   }
+
   const IngredientsSelectionPage({super.key});
 
   @override
@@ -23,6 +24,9 @@ class IngredientsSelectionPage extends ConsumerWidget {
     final selectedIngredients = ref.watch(ingredientsSelectionNotifierProvider);
     final matchingMealsCount = ref.watch(matchingMealsCountProvider);
     final searchQuery = ref.watch(_searchQueryProvider);
+
+    // Pre-load all meals when the page opens
+    ref.watch(allMealsPreloadProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +46,6 @@ class IngredientsSelectionPage extends ConsumerWidget {
               ),
             ),
           ),
-
           Expanded(
             child: ingredientsAsync.when(
               data: (ingredients) {
@@ -89,7 +92,8 @@ class IngredientsSelectionPage extends ConsumerWidget {
                   children: [
                     const Text('Failed to load ingredients.'),
                     ElevatedButton(
-                      onPressed: () => ref.refresh(ingredientFilterLogicProvider),
+                      onPressed: () =>
+                          ref.refresh(ingredientFilterLogicProvider),
                       child: const Text('Retry'),
                     )
                   ],

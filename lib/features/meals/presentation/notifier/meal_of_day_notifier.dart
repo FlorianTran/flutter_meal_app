@@ -42,7 +42,11 @@ final mealOfDayNotifierProvider =
   final apiClient = MealDbApiClient(baseUrl: AppConstants.mealdbApiUrl);
   final remoteDataSource = MealDbRemoteDataSourceImpl(apiClient: apiClient);
   final localDataSource = MealDbLocalDataSourceImpl();
-  final repository = MealsRepositoryImpl(remoteDataSource: remoteDataSource, localDataSource: localDataSource);  final getMealOfDay = GetMealOfDay(repository);
+  final repository = MealsRepositoryImpl(
+    remoteDataSource: remoteDataSource,
+    localDataSource: localDataSource,
+  );
+  final getMealOfDay = GetMealOfDay(repository);
 
   return MealOfDayNotifier(getMealOfDay: getMealOfDay);
 });

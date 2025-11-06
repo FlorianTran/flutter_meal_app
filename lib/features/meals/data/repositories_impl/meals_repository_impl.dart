@@ -175,7 +175,7 @@ class MealsRepositoryImpl implements MealsRepository {
   @override
   Future<({Failure? failure, List<Meal>? meals})> getAllMeals() async {
     try {
-      // 1. Vérifie le cache
+      // 1. Check the cache
       final cached = await localDataSource.getCachedMeals();
       if (cached != null && cached.isNotEmpty) {
         return (failure: null, meals: cached.map((m) => m.toEntity()).toList());
