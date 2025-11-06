@@ -41,7 +41,7 @@ class FindMatchingMealsExhaustive {
     
   //  print('[DEBUG] Found ${allMeals2.meals!.length} total meals to filter from.');
 
-    // 3. Filter meals matching selected ingredients
+    // 3. Filtrer les repas correspondant aux ingrédients sélectionnés
     final matchingMeals = allMeals2.meals!.where((meal) {
       final mealIngredients =
           meal.ingredients.map((e) => e.name.toLowerCase()).toSet();
@@ -60,7 +60,7 @@ class FindMatchingMealsExhaustive {
       }
     }
 
-    // 4. Find other possible ingredients among these meals
+    // 4. Trouver les autres ingrédients possibles parmi ces repas
     final allMatchingIngredients = matchingMeals
         .expand((meal) => meal.ingredients.map((e) => e.name.toLowerCase()))
         .toSet();
