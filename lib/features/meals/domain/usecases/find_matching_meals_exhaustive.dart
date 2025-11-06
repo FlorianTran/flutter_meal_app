@@ -65,7 +65,7 @@ class FindMatchingMealsExhaustive {
         .expand((meal) => meal.ingredients.map((e) => e.name.toLowerCase()))
         .toSet();
 
-    // On retire ceux déjà sélectionnés
+    // Remove already selected ones
     final possibleNextIngredients = allMatchingIngredients
         .difference(ingredients.map((e) => e.toLowerCase()).toSet())
         .toList()
