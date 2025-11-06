@@ -181,4 +181,29 @@ class MealsRepositoryImpl implements MealsRepository {
       return (failure: ServerFailure('Unexpected error: $e'), meals: null);
     }
   }
+
+  @override
+  Future<({Failure? failure, List<Meal>? meals})> getAllMeals() async {
+    try {
+      // 1. Check the cache
+      final cached = await localDataSource.getCachedMeals();
+      if (cached != null && cached.isNotEmpty) {
+        return (failure: null, meals: cached.map((m) => m.toEntity()).toList());
+      }
+
+      // 2. Sinon appelle le remote
+      final remoteMeals = await remoteDataSource.getAllMeals();
+
+      // 3. Stocke en cache pour les prochains appels
+      await localDataSource.cacheMeals(remoteMeals);
+
+      return (failure: null, meals: remoteMeals.map((m) => m.toEntity()).toList());
+    } on ServerException catch (e) {
+      return (failure: ServerFailure(e.message), meals: null);
+    } on CacheException catch (e) {
+      return (failure: CacheFailure(e.message), meals: null);
+    } catch (e) {
+      return (failure: ServerFailure('Unexpected error: $e'), meals: null);
+    }
+  }
 }
