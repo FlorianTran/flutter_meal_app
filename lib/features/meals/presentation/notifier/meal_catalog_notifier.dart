@@ -144,6 +144,17 @@ class MealCatalogNotifier extends StateNotifier<MealCatalogState> {
     loadAllMeals();
   }
 
+  void loadFavorites(List<Meal> favoriteMeals) {
+    state = state.copyWith(
+      isLoading: false,
+      meals: favoriteMeals,
+      clearSelectedCategory: true,
+      clearSelectedArea: true,
+      clearSearchQuery: true,
+      error: null,
+    );
+  }
+
   /// Load meals from all popular categories (no filter view)
   Future<void> loadAllMeals() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -246,7 +257,8 @@ final mealCatalogNotifierProvider =
   final apiClient = MealDbApiClient(baseUrl: AppConstants.mealdbApiUrl);
   final remoteDataSource = MealDbRemoteDataSourceImpl(apiClient: apiClient);
   final localDataSource = MealDbLocalDataSourceImpl();
-  final repository = MealsRepositoryImpl(remoteDataSource: remoteDataSource, localDataSource: localDataSource);
+  final repository = MealsRepositoryImpl(
+      remoteDataSource: remoteDataSource, localDataSource: localDataSource);
   final getMealsByCategory = GetMealsByCategory(repository);
   final getMealsByArea = GetMealsByArea(repository);
   final searchMeals = SearchMeals(repository);

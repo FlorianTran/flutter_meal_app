@@ -9,10 +9,12 @@ import '../widgets/meal_of_day_card.dart';
 import '../widgets/category_list.dart';
 import '../widgets/meal_card.dart';
 import '../notifier/recently_viewed_notifier.dart';
+import '../notifier/favorites_notifier.dart';
 import 'meal_catalog_page.dart';
 import 'meal_details_page.dart';
 import 'ingredients_selection_page.dart';
 import 'recently_viewed_page.dart';
+import 'favorites_page.dart';
 
 /// Home page based on Figma design
 class HomePage extends ConsumerStatefulWidget {
@@ -81,6 +83,11 @@ class _HomePageState extends ConsumerState<HomePage> {
 
                 // Recently Viewed Section
                 _buildRecentlyViewedSection(),
+
+                const SizedBox(height: 32),
+
+                // Favorites Section
+                _buildFavoritesSection(),
 
                 const SizedBox(height: 100), // Space for bottom navigation
               ],
@@ -156,14 +163,29 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ),
         const SizedBox(height: 8),
-        MealOfDayCard(
-          meal: state.meal!,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MealDetailsPage(mealId: state.meal!.id),
-              ),
+        Consumer(
+          builder: (context, ref, child) {
+            final favoritesNotifier =
+                ref.watch(favoritesNotifierProvider.notifier);
+            final isFavorite = ref.watch(isFavoriteProvider(state.meal!.id));
+
+            return MealOfDayCard(
+              meal: state.meal!,
+              isFavorite: isFavorite.value ?? false,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        MealDetailsPage(mealId: state.meal!.id),
+                  ),
+                );
+              },
+              onFavoriteTap: () async {
+                await favoritesNotifier.toggleFavorite(state.meal!);
+                // Refresh the favorite status
+                ref.invalidate(isFavoriteProvider(state.meal!.id));
+              },
             );
           },
         ),
@@ -401,6 +423,89 @@ class _HomePageState extends ConsumerState<HomePage> {
             itemCount: recentMeals.length,
             itemBuilder: (context, index) {
               final meal = recentMeals[index];
+              return Consumer(
+                builder: (context, ref, child) {
+                  final favoritesNotifier =
+                      ref.watch(favoritesNotifierProvider.notifier);
+                  final isFavorite = ref.watch(isFavoriteProvider(meal.id));
+
+                  return SizedBox(
+                    width: 160,
+                    height: 200,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: MealCard(
+                        meal: meal,
+                        isFavorite: isFavorite.value ?? false,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  MealDetailsPage(mealId: meal.id),
+                            ),
+                          );
+                        },
+                        onFavoriteTap: () async {
+                          await favoritesNotifier.toggleFavorite(meal);
+                          // Refresh the favorite status
+                          ref.invalidate(isFavoriteProvider(meal.id));
+                        },
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFavoritesSection() {
+    final state = ref.watch(favoritesNotifierProvider);
+
+    if (state.isLoading || state.meals.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    // Show only first 5 favorite meals
+    final favoriteMeals = state.meals.take(5).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Favorites',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(context, FavoritesPage.route());
+                },
+                child: const Text('See All'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: favoriteMeals.length,
+            itemBuilder: (context, index) {
+              final meal = favoriteMeals[index];
               return SizedBox(
                 width: 160,
                 height: 200,
@@ -408,6 +513,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   padding: const EdgeInsets.only(right: 12),
                   child: MealCard(
                     meal: meal,
+                    isFavorite: true,
                     onTap: () {
                       Navigator.push(
                         context,

@@ -114,8 +114,8 @@ class MealDetailsPage extends ConsumerWidget {
                     state.isFavorite ? Icons.star : Icons.star_border,
                     color: Colors.white,
                   ),
-                  onPressed: () {
-                    ref
+                  onPressed: () async {
+                    await ref
                         .read(mealDetailsNotifierProvider(mealId).notifier)
                         .toggleFavorite();
                   },

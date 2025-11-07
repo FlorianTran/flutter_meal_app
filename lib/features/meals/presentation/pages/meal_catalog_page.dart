@@ -4,6 +4,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../notifier/meal_catalog_notifier.dart';
 import '../notifier/meal_catalog_state.dart';
 import '../notifier/home_notifier.dart';
+import '../notifier/favorites_notifier.dart';
 import '../widgets/meal_card.dart';
 import '../widgets/search_bar.dart' show MealSearchBar;
 import '../widgets/filter_chips.dart';
@@ -62,6 +63,37 @@ class _MealCatalogPageState extends ConsumerState<MealCatalogPage> {
       appBar: AppBar(
         title: const Text('Meal Catalog'),
         actions: [
+          // Favorites filter toggle
+          Consumer(
+            builder: (context, ref, child) {
+              final favoritesState = ref.watch(favoritesNotifierProvider);
+              final isFilteringFavorites = catalogState.searchQuery == null &&
+                  catalogState.selectedCategory == null &&
+                  catalogState.selectedArea == null &&
+                  favoritesState.meals.isNotEmpty;
+              return IconButton(
+                icon: Icon(
+                  isFilteringFavorites ? Icons.star : Icons.star_border,
+                  color: isFilteringFavorites ? Colors.amber : null,
+                ),
+                tooltip: 'Show favorites only',
+                onPressed: () {
+                  // Toggle favorites filter
+                  if (isFilteringFavorites) {
+                    ref
+                        .read(mealCatalogNotifierProvider.notifier)
+                        .clearFilters();
+                  } else {
+                    // Load favorites
+                    final favorites = favoritesState.meals;
+                    ref
+                        .read(mealCatalogNotifierProvider.notifier)
+                        .loadFavorites(favorites);
+                  }
+                },
+              );
+            },
+          ),
           // Grid/List view toggle
           IconButton(
             icon: Icon(

@@ -8,12 +8,14 @@ class MealCard extends StatelessWidget {
   final Meal meal;
   final VoidCallback? onTap;
   final bool isFavorite;
+  final VoidCallback? onFavoriteTap;
 
   const MealCard({
     super.key,
     required this.meal,
     this.onTap,
     this.isFavorite = false,
+    this.onFavoriteTap,
   });
 
   @override
@@ -150,10 +152,17 @@ class MealCard extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                         ),
-                        Icon(
-                          isFavorite ? Icons.star : Icons.star_border,
-                          color: isFavorite ? Colors.amber : Colors.grey,
-                          size: 18,
+                        GestureDetector(
+                          onTap: () {
+                            if (onFavoriteTap != null) {
+                              onFavoriteTap!();
+                            }
+                          },
+                          child: Icon(
+                            isFavorite ? Icons.star : Icons.star_border,
+                            color: isFavorite ? Colors.amber : Colors.grey[700],
+                            size: 18,
+                          ),
                         ),
                       ],
                     ),

@@ -8,12 +8,14 @@ class MealOfDayCard extends StatelessWidget {
   final Meal meal;
   final VoidCallback? onTap;
   final bool isFavorite;
+  final VoidCallback? onFavoriteTap;
 
   const MealOfDayCard({
     super.key,
     required this.meal,
     this.onTap,
     this.isFavorite = false,
+    this.onFavoriteTap,
   });
 
   @override
@@ -84,16 +86,23 @@ class MealOfDayCard extends StatelessWidget {
               Positioned(
                 top: 12,
                 right: 12,
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha((255 * 0.9).round()),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    isFavorite ? Icons.star : Icons.star_border,
-                    color: isFavorite ? Colors.amber : Colors.grey,
-                    size: 24,
+                child: GestureDetector(
+                  onTap: () {
+                    if (onFavoriteTap != null) {
+                      onFavoriteTap!();
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha((255 * 0.9).round()),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isFavorite ? Icons.star : Icons.star_border,
+                      color: isFavorite ? Colors.amber : Colors.grey[700],
+                      size: 24,
+                    ),
                   ),
                 ),
               ),

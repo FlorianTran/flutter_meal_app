@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../notifier/recently_viewed_notifier.dart';
-import '../notifier/recently_viewed_state.dart';
 import '../notifier/favorites_notifier.dart';
+import '../notifier/favorites_state.dart';
 import '../widgets/meal_card.dart';
 import 'meal_details_page.dart';
 
-/// Page displaying recently viewed meals
-class RecentlyViewedPage extends ConsumerWidget {
-  const RecentlyViewedPage({super.key});
+/// Page displaying favorite meals
+class FavoritesPage extends ConsumerWidget {
+  const FavoritesPage({super.key});
 
   static Route<void> route() {
     return MaterialPageRoute(
-      builder: (context) => const RecentlyViewedPage(),
+      builder: (context) => const FavoritesPage(),
     );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(recentlyViewedNotifierProvider);
+    final state = ref.watch(favoritesNotifierProvider);
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
-        title: const Text('Recently Viewed'),
+        title: const Text('Favorites'),
         actions: [
           if (state.meals.isNotEmpty)
             IconButton(
@@ -41,7 +40,7 @@ class RecentlyViewedPage extends ConsumerWidget {
   Widget _buildContent(
     BuildContext context,
     WidgetRef ref,
-    RecentlyViewedState state,
+    FavoritesState state,
   ) {
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -64,7 +63,7 @@ class RecentlyViewedPage extends ConsumerWidget {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  ref.read(recentlyViewedNotifierProvider.notifier).refresh();
+                  ref.read(favoritesNotifierProvider.notifier).loadFavorites();
                 },
                 child: const Text('Retry'),
               ),
@@ -81,10 +80,10 @@ class RecentlyViewedPage extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.history, size: 64, color: Colors.grey),
+              const Icon(Icons.star_border, size: 64, color: Colors.grey),
               const SizedBox(height: 16),
               Text(
-                'No recently viewed meals',
+                'No favorite meals yet',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.grey[600],
@@ -93,7 +92,7 @@ class RecentlyViewedPage extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Meals you view will appear here',
+                'Tap the star icon on any meal to add it to favorites',
                 style: TextStyle(color: Colors.grey[500]),
                 textAlign: TextAlign.center,
               ),
@@ -105,7 +104,7 @@ class RecentlyViewedPage extends ConsumerWidget {
 
     return RefreshIndicator(
       onRefresh: () async {
-        await ref.read(recentlyViewedNotifierProvider.notifier).refresh();
+        await ref.read(favoritesNotifierProvider.notifier).loadFavorites();
       },
       child: GridView.builder(
         padding: const EdgeInsets.all(16),
@@ -118,26 +117,14 @@ class RecentlyViewedPage extends ConsumerWidget {
         itemCount: state.meals.length,
         itemBuilder: (context, index) {
           final meal = state.meals[index];
-          return Consumer(
-            builder: (context, ref, child) {
-              final favoritesNotifier = ref.watch(favoritesNotifierProvider.notifier);
-              final isFavorite = ref.watch(isFavoriteProvider(meal.id));
-              
-              return MealCard(
-                meal: meal,
-                isFavorite: isFavorite.value ?? false,
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => MealDetailsPage(mealId: meal.id),
-                    ),
-                  );
-                },
-                onFavoriteTap: () async {
-                  await favoritesNotifier.toggleFavorite(meal);
-                  // Refresh the favorite status
-                  ref.invalidate(isFavoriteProvider(meal.id));
-                },
+          return MealCard(
+            meal: meal,
+            isFavorite: true,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => MealDetailsPage(mealId: meal.id),
+                ),
               );
             },
           );
@@ -150,9 +137,9 @@ class RecentlyViewedPage extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Clear Recently Viewed'),
+        title: const Text('Clear All Favorites'),
         content: const Text(
-          'Are you sure you want to clear all recently viewed meals?',
+          'Are you sure you want to remove all favorite meals?',
         ),
         actions: [
           TextButton(
@@ -171,8 +158,7 @@ class RecentlyViewedPage extends ConsumerWidget {
     );
 
     if (confirmed == true) {
-      await ref.read(recentlyViewedNotifierProvider.notifier).clearAll();
+      await ref.read(favoritesNotifierProvider.notifier).clearAll();
     }
   }
 }
-
