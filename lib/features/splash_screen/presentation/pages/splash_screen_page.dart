@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_meal_app/features/auth/di/auth_injection.dart';
 import 'package:flutter_meal_app/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter_meal_app/features/meals/presentation/pages/home_page.dart';
+import 'package:lottie/lottie.dart';
 
 class SplashScreenPage extends ConsumerStatefulWidget {
   const SplashScreenPage({super.key});
@@ -13,31 +14,14 @@ class SplashScreenPage extends ConsumerStatefulWidget {
   ConsumerState<SplashScreenPage> createState() => _SplashScreenPageState();
 }
 
-class _SplashScreenPageState extends ConsumerState<SplashScreenPage>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _knifeRotation;
-  late Animation<double> _forkRotation;
+class _SplashScreenPageState extends ConsumerState<SplashScreenPage> {
   bool _canNavigate = false;
 
   @override
   void initState() {
     super.initState();
 
-    // Animation de rotation (simple)
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
-
-    _knifeRotation = Tween<double>(begin: -0.3, end: 0.3).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-    _forkRotation = Tween<double>(begin: 0.3, end: -0.3).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-
-    // ⏳ Forcer un minimum de 5 secondes avant de naviguer
+    // Forcer un minimum de 5 secondes avant de naviguer
     Future.delayed(const Duration(seconds: 5), () {
       _canNavigate = true;
       _checkAuthAndNavigate();
@@ -45,6 +29,9 @@ class _SplashScreenPageState extends ConsumerState<SplashScreenPage>
   }
 
   void _checkAuthAndNavigate() {
+    // Ensure the widget is still mounted before attempting to navigate
+    if (!mounted) return;
+
     final authState = ref.read(authStateProvider);
     authState.whenOrNull(
       data: (user) {
@@ -60,6 +47,14 @@ class _SplashScreenPageState extends ConsumerState<SplashScreenPage>
           }
         }
       },
+      // Handle error case if needed
+      error: (error, stackTrace) {
+        if (_canNavigate) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const LoginPage()),
+          );
+        }
+      },
     );
   }
 
@@ -71,30 +66,13 @@ class _SplashScreenPageState extends ConsumerState<SplashScreenPage>
     return Scaffold(
       backgroundColor: AppTheme.primaryGreen,
       body: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) => Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Transform.rotate(
-                angle: _knifeRotation.value,
-                child: Icon(Icons.restaurant, size: 80, color: Colors.white),
-              ),
-              const SizedBox(width: 30),
-              Transform.rotate(
-                angle: _forkRotation.value,
-                child: Icon(Icons.restaurant_menu, size: 80, color: Colors.white),
-              ),
-            ],
-          ),
+        child: Lottie.asset(
+          'lib/features/splash_screen/presentation/animations/animation.json',
+          width: 250,
+          height: 250,
+          fit: BoxFit.cover,
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }
