@@ -57,7 +57,10 @@ class FavoritesPage extends ConsumerWidget {
               const SizedBox(height: 16),
               Text(
                 'Error: ${state.error}',
-                style: TextStyle(color: Colors.grey[600]),
+                style: TextStyle(
+                  fontFamily: AppTheme.getFontFamily(null),
+                  color: Colors.grey[600],
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
@@ -80,11 +83,13 @@ class FavoritesPage extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.star_border, size: 64, color: Colors.grey),
+              Icon(Icons.star_border_rounded,
+                  size: 64, color: const Color(0xFFFFCC00).withOpacity(0.6)),
               const SizedBox(height: 16),
               Text(
                 'No favorite meals yet',
                 style: TextStyle(
+                  fontFamily: AppTheme.getFontFamily(FontWeight.w500),
                   fontSize: 18,
                   color: Colors.grey[600],
                   fontWeight: FontWeight.w500,
@@ -93,7 +98,10 @@ class FavoritesPage extends ConsumerWidget {
               const SizedBox(height: 8),
               Text(
                 'Tap the star icon on any meal to add it to favorites',
-                style: TextStyle(color: Colors.grey[500]),
+                style: TextStyle(
+                  fontFamily: AppTheme.getFontFamily(null),
+                  color: Colors.grey[500],
+                ),
                 textAlign: TextAlign.center,
               ),
             ],

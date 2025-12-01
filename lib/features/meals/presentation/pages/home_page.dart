@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -41,7 +43,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     final homeState = ref.watch(homeNotifierProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
+      backgroundColor: Colors.transparent,
+      extendBody: true,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -56,13 +59,26 @@ class _HomePageState extends ConsumerState<HomePage> {
                 // Header: "Find your next meal"
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-                  child: Text(
-                    'Find your\nnext meal',
-                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 32,
-                          height: 1.2,
+                  child: RichText(
+                    text: TextSpan(
+                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 64,
+                            height: 1,
+                            color: AppTheme.textBlack,
+                          ),
+                      children: [
+                        const TextSpan(text: 'Find your next\n'),
+                        TextSpan(
+                          text: 'meal',
+                          style: TextStyle(
+                            color: AppTheme.primaryGreen,
+                            fontFamily:
+                                AppTheme.getFontFamily(FontWeight.normal),
+                          ),
                         ),
+                      ],
+                    ),
                   ),
                 ),
 
@@ -155,10 +171,10 @@ class _HomePageState extends ConsumerState<HomePage> {
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'Meal of day',
+            'Meal of the day',
             style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: 24,
+              fontWeight: FontWeight.w100,
             ),
           ),
         ),
@@ -199,35 +215,37 @@ class _HomePageState extends ConsumerState<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "We'll suggest recipes that match what you have.",
             style: TextStyle(
+              fontFamily: AppTheme.getFontFamily(null),
               fontSize: 16,
-              color: Colors.black87,
+              color: AppTheme.textBlack,
+              fontWeight: FontWeight.w100,
             ),
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            height: 56,
+          Center(
             child: ElevatedButton(
               onPressed: () {
-                // TODO: Navigate to ingredients selection page
                 Navigator.push(context, IngredientsSelectionPage.route());
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryGreen,
                 foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(24),
                 ),
                 elevation: 0,
               ),
-              child: const Text(
+              child: Text(
                 'Select ingredients',
                 style: TextStyle(
+                  fontFamily: AppTheme.getFontFamily(FontWeight.w100),
                   fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w100,
                 ),
               ),
             ),
@@ -281,9 +299,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Categories',
                 style: TextStyle(
+                  fontFamily: AppTheme.getFontFamily(FontWeight.w600),
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -318,64 +337,76 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Container(
       margin: const EdgeInsets.all(16),
       height: 56,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha((255 * 0.7).round()),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Home button (active - green background)
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryGreen,
-                borderRadius: BorderRadius.circular(24),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(40),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(40),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 1,
               ),
-              child: const Center(
-                child: Icon(
-                  Icons.home,
-                  color: Colors.white,
-                  size: 24,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
-              ),
+              ],
             ),
-          ),
-          // List button (inactive - grey)
-          Expanded(
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MealCatalogPage(),
-                  ),
-                );
-              },
-              child: Container(
-                margin: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.list,
-                    color: Colors.grey[600],
-                    size: 24,
+            child: Row(
+              children: [
+                // Home button (active - green background)
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryGreen,
+                      borderRadius: BorderRadius.circular(36),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.home,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                // List button (inactive - grey)
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MealCatalogPage(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(36),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.list,
+                          color: Colors.grey[700],
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -398,9 +429,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Recently Viewed',
                 style: TextStyle(
+                  fontFamily: AppTheme.getFontFamily(FontWeight.w600),
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -416,7 +448,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 200,
+          height: 230,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -430,8 +462,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   final isFavorite = ref.watch(isFavoriteProvider(meal.id));
 
                   return SizedBox(
-                    width: 160,
-                    height: 200,
+                    width: 170,
+                    height: 230,
                     child: Padding(
                       padding: const EdgeInsets.only(right: 12),
                       child: MealCard(
@@ -481,9 +513,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Favorites',
                 style: TextStyle(
+                  fontFamily: AppTheme.getFontFamily(FontWeight.w600),
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -499,7 +532,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 200,
+          height: 230,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -507,8 +540,8 @@ class _HomePageState extends ConsumerState<HomePage> {
             itemBuilder: (context, index) {
               final meal = favoriteMeals[index];
               return SizedBox(
-                width: 160,
-                height: 200,
+                width: 170,
+                height: 230,
                 child: Padding(
                   padding: const EdgeInsets.only(right: 12),
                   child: MealCard(

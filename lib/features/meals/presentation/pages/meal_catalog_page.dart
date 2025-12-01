@@ -1,6 +1,7 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../notifier/meal_catalog_notifier.dart';
 import '../notifier/meal_catalog_state.dart';
 import '../notifier/home_notifier.dart';
@@ -9,6 +10,7 @@ import '../widgets/meal_card.dart';
 import '../widgets/search_bar.dart' show MealSearchBar;
 import '../widgets/filter_chips.dart';
 import 'meal_details_page.dart';
+import '../../domain/entities/meal.dart';
 
 /// Meal Catalog page with search, filter, and sort
 class MealCatalogPage extends ConsumerStatefulWidget {
@@ -59,41 +61,10 @@ class _MealCatalogPageState extends ConsumerState<MealCatalogPage> {
     }
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text('Meal Catalog'),
         actions: [
-          // Favorites filter toggle
-          Consumer(
-            builder: (context, ref, child) {
-              final favoritesState = ref.watch(favoritesNotifierProvider);
-              final isFilteringFavorites = catalogState.searchQuery == null &&
-                  catalogState.selectedCategory == null &&
-                  catalogState.selectedArea == null &&
-                  favoritesState.meals.isNotEmpty;
-              return IconButton(
-                icon: Icon(
-                  isFilteringFavorites ? Icons.star : Icons.star_border,
-                  color: isFilteringFavorites ? Colors.amber : null,
-                ),
-                tooltip: 'Show favorites only',
-                onPressed: () {
-                  // Toggle favorites filter
-                  if (isFilteringFavorites) {
-                    ref
-                        .read(mealCatalogNotifierProvider.notifier)
-                        .clearFilters();
-                  } else {
-                    // Load favorites
-                    final favorites = favoritesState.meals;
-                    ref
-                        .read(mealCatalogNotifierProvider.notifier)
-                        .loadFavorites(favorites);
-                  }
-                },
-              );
-            },
-          ),
           // Grid/List view toggle
           IconButton(
             icon: Icon(
@@ -105,44 +76,98 @@ class _MealCatalogPageState extends ConsumerState<MealCatalogPage> {
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
+        clipBehavior: Clip.none,
         children: [
-          // Search bar
-          MealSearchBar(
-            key: const ValueKey(
-                'meal_search_bar'), // Stable key to prevent rebuilds
-            initialValue: catalogState.searchQuery,
-            onChanged: (query) {
-              ref.read(mealCatalogNotifierProvider.notifier).search(query);
-            },
-            onClear: () {
-              ref.read(mealCatalogNotifierProvider.notifier).clearFilters();
-            },
-          ),
-
-          // Filter chips for categories
-          if (homeState.categories.isNotEmpty)
-            FilterChips(
-              items: homeState.categories.map((c) => c.name).toList(),
-              selectedItem: catalogState.selectedCategory,
-              onItemSelected: (category) {
-                // Toggle: if clicking the same category, clear filter
-                if (catalogState.selectedCategory == category) {
-                  ref.read(mealCatalogNotifierProvider.notifier).clearFilters();
-                } else {
-                  // Clear search when applying filter
-                  ref
-                      .read(mealCatalogNotifierProvider.notifier)
-                      .loadMealsByCategory(category);
-                }
-              },
+          // Background food images
+          Positioned(
+            top: 400,
+            right: 250,
+            child: Transform.rotate(
+              angle: 0.3,
+              child: Image.asset(
+                'assets/images/food_image.png',
+                width: 500,
+                height: 500,
+                fit: BoxFit.contain,
+              ),
             ),
+          ),
+          Positioned(
+            top: 350,
+            right: -100,
+            child: Transform.rotate(
+              angle: -0.2,
+              child: Image.asset(
+                'assets/images/food_image_1.png',
+                width: 230,
+                height: 230,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          Positioned(
+            top: 600,
+            right: -70,
+            child: Transform.rotate(
+              angle: 0.15,
+              child: Image.asset(
+                'assets/images/food_image_2.png',
+                width: 290,
+                height: 290,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          // Main content
+          SafeArea(
+            child: Column(
+              children: [
+                // Search bar
+                MealSearchBar(
+                  key: const ValueKey(
+                      'meal_search_bar'), // Stable key to prevent rebuilds
+                  initialValue: catalogState.searchQuery,
+                  onChanged: (query) {
+                    ref
+                        .read(mealCatalogNotifierProvider.notifier)
+                        .search(query);
+                  },
+                  onClear: () {
+                    ref
+                        .read(mealCatalogNotifierProvider.notifier)
+                        .clearFilters();
+                  },
+                ),
 
-          const SizedBox(height: 8),
+                // Filter chips for categories
+                if (homeState.categories.isNotEmpty)
+                  FilterChips(
+                    items: homeState.categories.map((c) => c.name).toList(),
+                    selectedItem: catalogState.selectedCategory,
+                    onItemSelected: (category) {
+                      // Toggle: if clicking the same category, clear filter
+                      if (catalogState.selectedCategory == category) {
+                        ref
+                            .read(mealCatalogNotifierProvider.notifier)
+                            .clearFilters();
+                      } else {
+                        // Clear search when applying filter
+                        ref
+                            .read(mealCatalogNotifierProvider.notifier)
+                            .loadMealsByCategory(category);
+                      }
+                    },
+                  ),
 
-          // Meals list/grid
-          Expanded(
-            child: _buildMealsContent(catalogState),
+                const SizedBox(height: 8),
+
+                // Meals list/grid
+                Expanded(
+                  child: _buildMealsContent(catalogState),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -221,17 +246,7 @@ class _MealCatalogPageState extends ConsumerState<MealCatalogPage> {
         itemCount: state.meals.length,
         itemBuilder: (context, index) {
           final meal = state.meals[index];
-          return MealCard(
-            meal: meal,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MealDetailsPage(mealId: meal.id),
-                ),
-              );
-            },
-          );
+          return _buildMealCardWithFavorites(meal);
         },
       );
     } else {
@@ -242,20 +257,32 @@ class _MealCatalogPageState extends ConsumerState<MealCatalogPage> {
           final meal = state.meals[index];
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
-            child: MealCard(
-              meal: meal,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MealDetailsPage(mealId: meal.id),
-                  ),
-                );
-              },
-            ),
+            child: _buildMealCardWithFavorites(meal),
           );
         },
       );
     }
+  }
+
+  Widget _buildMealCardWithFavorites(Meal meal) {
+    final favoritesState = ref.watch(favoritesNotifierProvider);
+    final isFavorite = favoritesState.meals.any((m) => m.id == meal.id);
+
+    return MealCard(
+      meal: meal,
+      isFavorite: isFavorite,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MealDetailsPage(mealId: meal.id),
+          ),
+        );
+      },
+      onFavoriteTap: () async {
+        final favoritesNotifier = ref.read(favoritesNotifierProvider.notifier);
+        await favoritesNotifier.toggleFavorite(meal);
+      },
+    );
   }
 }

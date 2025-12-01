@@ -98,7 +98,8 @@ class SimilarMealCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           '$commonIngredientsCount/$totalIngredientsCount ingredients',
-                          style: const TextStyle(
+                          style: TextStyle(
+                            fontFamily: AppTheme.getFontFamily(null),
                             fontSize: 11,
                             color: Colors.grey,
                           ),
@@ -128,7 +129,8 @@ class SimilarMealCard extends StatelessWidget {
                       ),
                       child: Text(
                         meal.category!,
-                        style: const TextStyle(
+                        style: TextStyle(
+                          fontFamily: AppTheme.getFontFamily(FontWeight.w500),
                           fontSize: 10,
                           color: AppTheme.primaryGreen,
                           fontWeight: FontWeight.w500,

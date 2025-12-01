@@ -43,3 +43,13 @@ flutter:
   uses-material-design: true
   assets:
     - .env
+    - assets/images/
+  fonts:
+    - family: Sansation
+      fonts:
+        - asset: fonts/sansation/Sansation_Regular.ttf
+        - asset: fonts/sansation/Sansation_Bold.ttf
+          weight: 700
+    - family: SansationLight
+      fonts:
+        - asset: fonts/sansation/Sansation_Light.ttf

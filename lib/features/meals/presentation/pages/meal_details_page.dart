@@ -40,9 +40,7 @@ class MealDetailsPage extends ConsumerWidget {
         }
 
         // Add to recently viewed
-        ref
-            .read(recentlyViewedNotifierProvider.notifier)
-            .addMeal(state.meal!);
+        ref.read(recentlyViewedNotifierProvider.notifier).addMeal(state.meal!);
       });
     }
 
@@ -111,8 +109,11 @@ class MealDetailsPage extends ConsumerWidget {
               Builder(
                 builder: (context) => IconButton(
                   icon: Icon(
-                    state.isFavorite ? Icons.star : Icons.star_border,
-                    color: Colors.white,
+                    state.isFavorite
+                        ? Icons.star_rounded
+                        : Icons.star_border_rounded,
+                    color: const Color(0xFFFFCC00),
+                    size: 28,
                   ),
                   onPressed: () async {
                     await ref
@@ -179,7 +180,8 @@ class MealDetailsPage extends ConsumerWidget {
           // Meal name
           Text(
             meal.name,
-            style: const TextStyle(
+            style: TextStyle(
+              fontFamily: AppTheme.getFontFamily(FontWeight.bold),
               fontSize: 28,
               fontWeight: FontWeight.bold,
             ),
@@ -205,7 +207,8 @@ class MealDetailsPage extends ConsumerWidget {
                     ),
                     child: Text(
                       meal.category!,
-                      style: const TextStyle(
+                      style: TextStyle(
+                        fontFamily: AppTheme.getFontFamily(FontWeight.w600),
                         color: AppTheme.primaryGreen,
                         fontWeight: FontWeight.w600,
                       ),
@@ -224,6 +227,7 @@ class MealDetailsPage extends ConsumerWidget {
                     child: Text(
                       meal.area!,
                       style: TextStyle(
+                        fontFamily: AppTheme.getFontFamily(FontWeight.w500),
                         color: Colors.grey[700],
                         fontWeight: FontWeight.w500,
                       ),
@@ -283,10 +287,11 @@ class MealDetailsPage extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
                   'You might also like',
-                  style: TextStyle(
+                  style: const TextStyle(
+                    fontFamily: 'Sansation',
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -319,9 +324,10 @@ class MealDetailsPage extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'You might also like',
                   style: TextStyle(
+                    fontFamily: AppTheme.getFontFamily(FontWeight.bold),
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -398,6 +404,9 @@ class MealDetailsPage extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           side: const BorderSide(color: AppTheme.primaryGreen),
           foregroundColor: AppTheme.primaryGreen,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
         ),
       ),
     );

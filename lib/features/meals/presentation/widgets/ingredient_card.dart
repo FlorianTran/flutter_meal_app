@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class IngredientCard extends StatelessWidget {
   final String ingredientName;
@@ -27,39 +28,44 @@ class IngredientCard extends StatelessWidget {
       onLongPress: onLongPress,
       child: Card(
         clipBehavior: Clip.antiAlias,
+        elevation: 1,
+        margin: EdgeInsets.zero,
         child: Stack(
           fit: StackFit.expand,
           children: [
             // Main content column that fills the card
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Image takes 70% of available space
-                Flexible(
-                  flex: 7,
+                // Image takes less space
+                Expanded(
+                  flex: 3,
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(4.0),
                     child: Image.network(
                       imageUrl,
                       fit: BoxFit.contain,
                       errorBuilder: (c, o, s) =>
-                          const Icon(Icons.fastfood, size: 40),
+                          const Icon(Icons.fastfood, size: 24),
                     ),
                   ),
                 ),
-                // Text takes 30% of available space
-                Flexible(
-                  flex: 3,
+                // Text takes less space
+                Expanded(
+                  flex: 2,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 4.0, vertical: 2.0),
                     child: Text(
                       ingredientName,
                       textAlign: TextAlign.center,
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 10),
+                      style: TextStyle(
+                        fontFamily: AppTheme.getFontFamily(null),
+                        fontSize: 9,
+                      ),
                     ),
                   ),
                 ),

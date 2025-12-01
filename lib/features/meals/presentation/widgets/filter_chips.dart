@@ -23,7 +23,7 @@ class FilterChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? AppTheme.primaryGreen : Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(32),
           border: Border.all(
             color: isSelected ? AppTheme.primaryGreen : Colors.grey[300]!,
             width: 1,
@@ -32,7 +32,8 @@ class FilterChip extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87,
+            fontFamily: AppTheme.getFontFamily(isSelected ? FontWeight.w600 : FontWeight.normal),
+            color: isSelected ? Colors.white : AppTheme.textBlack,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             fontSize: 14,
           ),

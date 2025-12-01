@@ -62,7 +62,7 @@ class IngredientsSelectionPage extends ConsumerWidget {
                   padding: const EdgeInsets.all(8),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
-                    childAspectRatio: 0.8,
+                    childAspectRatio: 2,
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,
                   ),
