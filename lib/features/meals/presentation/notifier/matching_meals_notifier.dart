@@ -17,26 +17,13 @@ final allMealsPreloadProvider =
   return result.meals ?? [];
 });
 
-/// Provider to pre-load all meals when the ingredients page opens
-/// This ensures meals are available immediately when ingredients are selected
-final allMealsPreloadProvider =
+/// Provider that returns meals matching the selected ingredients
+final matchingMealsProvider =
     FutureProvider.autoDispose<List<Meal>>((ref) async {
-  final getAllMeals2 = ref.watch(getAllMeals2UseCaseProvider);
-  final result = await getAllMeals2();
-
-  if (result.failure != null) {
-    throw result.failure!;
-  }
-
-  return result.meals ?? [];
-});
-
-/// Provides the count of meals that match the selected ingredients.
-final matchingMealsCountProvider = FutureProvider.autoDispose<int>((ref) async {
   final selectedIngredients = ref.watch(ingredientsSelectionNotifierProvider);
-  
+
   if (selectedIngredients.isEmpty) {
-    return 0;
+    return [];
   }
 
   // Pre-load all meals if not already loaded
@@ -51,6 +38,16 @@ final matchingMealsCountProvider = FutureProvider.autoDispose<int>((ref) async {
   }).toList();
 
   return matchingMeals;
+});
+
+/// Provides the count of meals that match the selected ingredients.
+final matchingMealsCountProvider = Provider.autoDispose<AsyncValue<int>>((ref) {
+  final matchingMeals = ref.watch(matchingMealsProvider);
+  return matchingMeals.when(
+    data: (meals) => AsyncValue.data(meals.length),
+    loading: () => const AsyncValue.loading(),
+    error: (err, stack) => AsyncValue.error(err, stack),
+  );
 });
 
 final allIngredientsFromMatchingMealsProvider =
@@ -71,15 +68,6 @@ final allIngredientsFromMatchingMealsProvider =
     },
     loading: () => [],
     error: (err, stack) => [],
-  );
-});
-
-final matchingMealsCountProvider = Provider.autoDispose<AsyncValue<int>>((ref) {
-  final matchingMeals = ref.watch(matchingMealsProvider);
-  return matchingMeals.when(
-    data: (meals) => AsyncValue.data(meals.length),
-    loading: () => const AsyncValue.loading(),
-    error: (err, stack) => AsyncValue.error(err, stack),
   );
 });
 

@@ -21,8 +21,6 @@ abstract class MealDbRemoteDataSource {
 
 class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
   final MealDbApiClient apiClient;
-class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
-  final MealDbApiClient apiClient;
 
   MealDbRemoteDataSourceImpl({required this.apiClient});
 
@@ -36,7 +34,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
         throw const ServerException('No meal found');
       }
 
-      return MealModel.fromMealDbJson(response);
+      return MealModel.fromJson(meals[0] as Map<String, dynamic>);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -54,7 +52,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
         throw ServerException('Meal with id $id not found');
       }
 
-      return MealModel.fromMealDbJson(response);
+      return MealModel.fromJson(meals[0] as Map<String, dynamic>);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -259,8 +257,6 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
     } catch (e) {
       throw ServerException('Failed to get meals by ingredient: $e');
     }
-
-    return allMeals;
   }
 
   @override

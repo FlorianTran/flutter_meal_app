@@ -4,23 +4,20 @@ import '../../domain/repositories/meals_repository.dart';
 import '../../domain/entities/meal.dart';
 import '../../domain/entities/category.dart';
 import '../datasources/mealdb_remote_datasource.dart';
+import '../datasources/mealdb_local_data_source.dart';
 
 /// Implementation of MealsRepository
 /// Converts exceptions from data source to failures for domain layer
 class MealsRepositoryImpl implements MealsRepository {
   final MealDbRemoteDataSource remoteDataSource;
+  final MealDbLocalDataSource localDataSource;
 
-  MealsRepositoryImpl({required this.remoteDataSource});
+  MealsRepositoryImpl({
+    required this.remoteDataSource,
+    required this.localDataSource,
+  });
 
   @override
-  Future<({Failure? failure, Meal? meal})> getMealOfDay() async {
-    try {
-      final mealModel = await remoteDataSource.getRandomMeal();
-      return (failure: null, meal: mealModel.toEntity());
-    } on ServerException catch (e) {
-      return (failure: ServerFailure(e.message), meal: null);
-    } catch (e) {
-      return (failure: ServerFailure('Unexpected error: $e'), meal: null);
   Future<({Failure? failure, Meal? meal})> getMealOfDay() async {
     try {
       final mealModel = await remoteDataSource.getRandomMeal();
@@ -33,14 +30,6 @@ class MealsRepositoryImpl implements MealsRepository {
   }
 
   @override
-  Future<({Failure? failure, Meal? meal})> getMealDetails(String id) async {
-    try {
-      final mealModel = await remoteDataSource.getMealDetails(id);
-      return (failure: null, meal: mealModel.toEntity());
-    } on ServerException catch (e) {
-      return (failure: ServerFailure(e.message), meal: null);
-    } catch (e) {
-      return (failure: ServerFailure('Unexpected error: $e'), meal: null);
   Future<({Failure? failure, Meal? meal})> getMealDetails(String id) async {
     try {
       final mealModel = await remoteDataSource.getMealDetails(id);

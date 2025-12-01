@@ -11,7 +11,6 @@ class MyApp extends ConsumerWidget {
     return MaterialApp(
       title: 'Meal App',
       theme: AppTheme.lightTheme,
-      home: authState.isAuthenticated ? const HomePage() : const LoginPage(),
       debugShowCheckedModeBanner: false,
       home: const SplashScreenPage(),
     );
