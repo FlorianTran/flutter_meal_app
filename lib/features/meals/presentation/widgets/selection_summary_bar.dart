@@ -26,8 +26,20 @@ class SelectionSummaryBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('$selectionCount ingredients selected', style: const TextStyle(color: Colors.white)),
-              Text('$mealCount meals available', style: const TextStyle(color: Colors.white)),
+              Text(
+                '$selectionCount ingredients selected',
+                style: TextStyle(
+                  fontFamily: 'Sansation',
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                '$mealCount meals available',
+                style: TextStyle(
+                  fontFamily: 'Sansation',
+                  color: Colors.white,
+                ),
+              ),
             ],
           ),
           IconButton(

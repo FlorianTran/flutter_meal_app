@@ -12,7 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // 1. Mock Data
-final _mealA = Meal(
+const _mealA = Meal(
   id: '1',
   name: 'Chicken Stir-Fry',
   ingredients: [
@@ -22,7 +22,7 @@ final _mealA = Meal(
   ],
 );
 
-final _mealB = Meal(
+const _mealB = Meal(
   id: '2',
   name: 'Chicken & Rice',
   ingredients: [
@@ -32,7 +32,7 @@ final _mealB = Meal(
   ],
 );
 
-final _mealC = Meal(
+const _mealC = Meal(
   id: '3',
   name: 'Beef Tacos',
   ingredients: [

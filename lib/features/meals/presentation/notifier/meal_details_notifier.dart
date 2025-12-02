@@ -6,12 +6,16 @@ import '../../data/datasources/mealdb_remote_datasource.dart';
 import '../../../../core/network/mealdb_api_client.dart';
 import '../../../../core/constants/app_constants.dart';
 import 'meal_details_state.dart';
+import 'favorites_notifier.dart';
 
 class MealDetailsNotifier extends StateNotifier<MealDetailsState> {
   final GetMealDetails getMealDetails;
+  final FavoritesNotifier? favoritesNotifier;
 
-  MealDetailsNotifier({required this.getMealDetails})
-      : super(const MealDetailsState());
+  MealDetailsNotifier({
+    required this.getMealDetails,
+    this.favoritesNotifier,
+  }) : super(const MealDetailsState());
 
   Future<void> loadMealDetails(String mealId) async {
     state = state.copyWith(isLoading: true, error: null);
@@ -24,17 +28,32 @@ class MealDetailsNotifier extends StateNotifier<MealDetailsState> {
         error: result.failure!.message,
       );
     } else {
+      // Check if meal is favorite
+      bool isFavorite = false;
+      if (favoritesNotifier != null) {
+        isFavorite = await favoritesNotifier!.isFavorite(mealId);
+      }
+
       state = state.copyWith(
         isLoading: false,
         meal: result.meal,
+        isFavorite: isFavorite,
       );
     }
   }
 
-  void toggleFavorite() {
-    // TODO: Implement favorite functionality (will be done by Dev 2)
-    // For now, just toggle the UI state
-    state = state.copyWith(isFavorite: !state.isFavorite);
+  Future<void> toggleFavorite() async {
+    if (state.meal == null) return;
+
+    if (favoritesNotifier != null) {
+      await favoritesNotifier!.toggleFavorite(state.meal!);
+      // Update state with new favorite status
+      final isFavorite = await favoritesNotifier!.isFavorite(state.meal!.id);
+      state = state.copyWith(isFavorite: isFavorite);
+    } else {
+      // Fallback: just toggle UI state
+      state = state.copyWith(isFavorite: !state.isFavorite);
+    }
   }
 
   void refresh() {
@@ -52,10 +71,15 @@ final mealDetailsNotifierProvider =
     final apiClient = MealDbApiClient(baseUrl: AppConstants.mealdbApiUrl);
     final remoteDataSource = MealDbRemoteDataSourceImpl(apiClient: apiClient);
     final localDataSource = MealDbLocalDataSourceImpl();
-  final repository = MealsRepositoryImpl(remoteDataSource: remoteDataSource, localDataSource: localDataSource);
+    final repository = MealsRepositoryImpl(
+        remoteDataSource: remoteDataSource, localDataSource: localDataSource);
     final getMealDetails = GetMealDetails(repository);
+    final favoritesNotifier = ref.read(favoritesNotifierProvider.notifier);
 
-    final notifier = MealDetailsNotifier(getMealDetails: getMealDetails);
+    final notifier = MealDetailsNotifier(
+      getMealDetails: getMealDetails,
+      favoritesNotifier: favoritesNotifier,
+    );
     notifier.loadMealDetails(mealId);
     return notifier;
   },

@@ -7,8 +7,12 @@ import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/meal.dart';
 import '../notifier/meal_details_notifier.dart';
 import '../notifier/meal_details_state.dart';
+import '../notifier/similar_meals_notifier.dart';
+import '../notifier/recently_viewed_notifier.dart';
 import '../widgets/meal_ingredients_list.dart';
 import '../widgets/meal_instructions.dart';
+import '../widgets/similar_meal_card.dart';
+import 'similar_meals_page.dart';
 
 /// Meal Details page showing complete recipe information
 class MealDetailsPage extends ConsumerWidget {
@@ -22,6 +26,23 @@ class MealDetailsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(mealDetailsNotifierProvider(mealId));
+
+    // Load similar meals when meal is loaded (only once)
+    // Also add meal to recently viewed
+    if (state.meal != null && !state.isLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Load similar meals
+        final similarMealsState = ref.read(similarMealsNotifierProviderForMeal);
+        if (similarMealsState.meals.isEmpty && !similarMealsState.isLoading) {
+          ref
+              .read(similarMealsNotifierProviderForMeal.notifier)
+              .loadSimilarMeals(state.meal!, limit: 6);
+        }
+
+        // Add to recently viewed
+        ref.read(recentlyViewedNotifierProvider.notifier).addMeal(state.meal!);
+      });
+    }
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
@@ -45,6 +66,10 @@ class MealDetailsPage extends ConsumerWidget {
                         ? _buildContent(context, ref, state)
                         : const SizedBox.shrink(),
           ),
+
+          // Similar meals section
+          if (state.meal != null && !state.isLoading)
+            _buildSimilarMealsSection(context, ref, state.meal!),
         ],
       ),
     );
@@ -84,11 +109,14 @@ class MealDetailsPage extends ConsumerWidget {
               Builder(
                 builder: (context) => IconButton(
                   icon: Icon(
-                    state.isFavorite ? Icons.star : Icons.star_border,
-                    color: Colors.white,
+                    state.isFavorite
+                        ? Icons.star_rounded
+                        : Icons.star_border_rounded,
+                    color: const Color(0xFFFFCC00),
+                    size: 28,
                   ),
-                  onPressed: () {
-                    ref
+                  onPressed: () async {
+                    await ref
                         .read(mealDetailsNotifierProvider(mealId).notifier)
                         .toggleFavorite();
                   },
@@ -152,7 +180,8 @@ class MealDetailsPage extends ConsumerWidget {
           // Meal name
           Text(
             meal.name,
-            style: const TextStyle(
+            style: TextStyle(
+              fontFamily: AppTheme.getFontFamily(FontWeight.bold),
               fontSize: 28,
               fontWeight: FontWeight.bold,
             ),
@@ -172,12 +201,14 @@ class MealDetailsPage extends ConsumerWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withAlpha((255 * 0.6).round()),
+                      color:
+                          AppTheme.primaryGreen.withAlpha((255 * 0.6).round()),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
                       meal.category!,
-                      style: const TextStyle(
+                      style: TextStyle(
+                        fontFamily: AppTheme.getFontFamily(FontWeight.w600),
                         color: AppTheme.primaryGreen,
                         fontWeight: FontWeight.w600,
                       ),
@@ -196,6 +227,7 @@ class MealDetailsPage extends ConsumerWidget {
                     child: Text(
                       meal.area!,
                       style: TextStyle(
+                        fontFamily: AppTheme.getFontFamily(FontWeight.w500),
                         color: Colors.grey[700],
                         fontWeight: FontWeight.w500,
                       ),
@@ -242,6 +274,120 @@ class MealDetailsPage extends ConsumerWidget {
     );
   }
 
+  Widget _buildSimilarMealsSection(
+      BuildContext context, WidgetRef ref, Meal meal) {
+    final similarMealsState = ref.watch(similarMealsNotifierProviderForMeal);
+
+    // Show loading indicator while loading
+    if (similarMealsState.isLoading) {
+      return const SliverToBoxAdapter(
+        child: Padding(
+          padding: EdgeInsets.all(32.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'You might also like',
+                  style: const TextStyle(
+                    fontFamily: 'Sansation',
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+              Center(child: CircularProgressIndicator()),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Don't show section if no similar meals found
+    if (similarMealsState.meals.isEmpty) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
+
+    final mealIngredientNames = meal.ingredients
+        .map((ing) => ing.name.toLowerCase().trim())
+        .where((name) => name.isNotEmpty)
+        .toSet();
+
+    return SliverToBoxAdapter(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'You might also like',
+                  style: TextStyle(
+                    fontFamily: AppTheme.getFontFamily(FontWeight.bold),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (similarMealsState.meals.length > 6)
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        SimilarMealsPage.route(meal),
+                      );
+                    },
+                    child: const Text('View All'),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 280,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: similarMealsState.meals.length > 6
+                  ? 6
+                  : similarMealsState.meals.length,
+              itemBuilder: (context, index) {
+                final similarMeal = similarMealsState.meals[index];
+                final similarMealIngredientNames = similarMeal.ingredients
+                    .map((ing) => ing.name.toLowerCase().trim())
+                    .where((name) => name.isNotEmpty)
+                    .toSet();
+
+                final commonIngredients = mealIngredientNames
+                    .intersection(similarMealIngredientNames);
+                final totalIngredients = mealIngredientNames
+                    .union(similarMealIngredientNames)
+                    .length;
+
+                return SimilarMealCard(
+                  meal: similarMeal,
+                  commonIngredientsCount: commonIngredients.length,
+                  totalIngredientsCount: totalIngredients,
+                  onTap: () {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            MealDetailsPage(mealId: similarMeal.id),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLinkButton(
     BuildContext context, {
     required IconData icon,
@@ -258,6 +404,9 @@ class MealDetailsPage extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           side: const BorderSide(color: AppTheme.primaryGreen),
           foregroundColor: AppTheme.primaryGreen,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
         ),
       ),
     );

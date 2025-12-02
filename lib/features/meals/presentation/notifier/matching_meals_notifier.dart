@@ -17,9 +17,9 @@ final allMealsPreloadProvider =
   return result.meals ?? [];
 });
 
+/// Provider that returns meals matching the selected ingredients
 final matchingMealsProvider =
     FutureProvider.autoDispose<List<Meal>>((ref) async {
-  // WATCH instead of READ to ensure this provider re-runs on change.
   final selectedIngredients = ref.watch(ingredientsSelectionNotifierProvider);
 
   if (selectedIngredients.isEmpty) {
@@ -40,6 +40,16 @@ final matchingMealsProvider =
   return matchingMeals;
 });
 
+/// Provides the count of meals that match the selected ingredients.
+final matchingMealsCountProvider = Provider.autoDispose<AsyncValue<int>>((ref) {
+  final matchingMeals = ref.watch(matchingMealsProvider);
+  return matchingMeals.when(
+    data: (meals) => AsyncValue.data(meals.length),
+    loading: () => const AsyncValue.loading(),
+    error: (err, stack) => AsyncValue.error(err, stack),
+  );
+});
+
 final allIngredientsFromMatchingMealsProvider =
     Provider.autoDispose<List<String>>((ref) {
   final matchingMeals = ref.watch(matchingMealsProvider);
@@ -58,15 +68,6 @@ final allIngredientsFromMatchingMealsProvider =
     },
     loading: () => [],
     error: (err, stack) => [],
-  );
-});
-
-final matchingMealsCountProvider = Provider.autoDispose<AsyncValue<int>>((ref) {
-  final matchingMeals = ref.watch(matchingMealsProvider);
-  return matchingMeals.when(
-    data: (meals) => AsyncValue.data(meals.length),
-    loading: () => const AsyncValue.loading(),
-    error: (err, stack) => AsyncValue.error(err, stack),
   );
 });
 

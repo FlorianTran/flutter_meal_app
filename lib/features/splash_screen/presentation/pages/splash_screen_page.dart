@@ -24,7 +24,6 @@ class _SplashScreenPageState extends ConsumerState<SplashScreenPage>
   void initState() {
     super.initState();
 
-    // Animation de rotation (simple)
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -37,8 +36,7 @@ class _SplashScreenPageState extends ConsumerState<SplashScreenPage>
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
-    // ⏳ Forcer un minimum de 5 secondes avant de naviguer
-    Future.delayed(const Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 2), () {
       _canNavigate = true;
       _checkAuthAndNavigate();
     });
@@ -65,7 +63,6 @@ class _SplashScreenPageState extends ConsumerState<SplashScreenPage>
 
   @override
   Widget build(BuildContext context) {
-    // Surveille l’état d’auth et navigue quand prêt + délai atteint
     ref.listen(authStateProvider, (_, __) => _checkAuthAndNavigate());
 
     return Scaffold(

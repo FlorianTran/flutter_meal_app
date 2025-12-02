@@ -22,9 +22,10 @@ class MealInstructions extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Instructions',
           style: TextStyle(
+            fontFamily: AppTheme.getFontFamily(FontWeight.bold),
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -102,7 +103,8 @@ class _InstructionStep extends StatelessWidget {
             child: Center(
               child: Text(
                 '$stepNumber',
-                style: const TextStyle(
+                style: TextStyle(
+                  fontFamily: AppTheme.getFontFamily(FontWeight.bold),
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
@@ -115,7 +117,8 @@ class _InstructionStep extends StatelessWidget {
           Expanded(
             child: Text(
               instruction,
-              style: const TextStyle(
+              style: TextStyle(
+                fontFamily: AppTheme.getFontFamily(null),
                 fontSize: 16,
                 height: 1.5,
               ),

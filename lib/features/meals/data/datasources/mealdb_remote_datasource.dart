@@ -1,4 +1,3 @@
-
 import '../../../../core/network/mealdb_api_client.dart';
 import '../../../../core/error/exceptions.dart';
 import '../models/meal_model.dart';
@@ -35,7 +34,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
         throw const ServerException('No meal found');
       }
 
-      return MealModel.fromJson(meals.first as Map<String, dynamic>);
+      return MealModel.fromJson(meals[0] as Map<String, dynamic>);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -53,7 +52,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
         throw ServerException('Meal with id $id not found');
       }
 
-      return MealModel.fromJson(meals.first as Map<String, dynamic>);
+      return MealModel.fromJson(meals[0] as Map<String, dynamic>);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -65,7 +64,15 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
   Future<List<MealModel>> searchMeals(String query) async {
     try {
       final response = await apiClient.searchMeals(query);
-      return MealModel.parseMealsListFromJson(response);
+      final meals = response['meals'] as List?;
+
+      if (meals == null) {
+        return [];
+      }
+
+      return meals
+          .map((meal) => MealModel.fromJson(meal as Map<String, dynamic>))
+          .toList();
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -77,7 +84,15 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
   Future<List<MealModel>> searchMealsByLetter(String letter) async {
     try {
       final response = await apiClient.searchMealsByLetter(letter);
-      return MealModel.parseMealsListFromJson(response);
+      final meals = response['meals'] as List?;
+
+      if (meals == null) {
+        return [];
+      }
+
+      return meals
+          .map((meal) => MealModel.fromJson(meal as Map<String, dynamic>))
+          .toList();
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -188,7 +203,15 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
   Future<List<MealModel>> getMealsByCategory(String category) async {
     try {
       final response = await apiClient.filterByCategory(category);
-      return MealModel.parseMealsListFromJson(response);
+      final meals = response['meals'] as List?;
+
+      if (meals == null) {
+        return [];
+      }
+
+      return meals
+          .map((meal) => MealModel.fromJson(meal as Map<String, dynamic>))
+          .toList();
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -200,7 +223,15 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
   Future<List<MealModel>> getMealsByArea(String area) async {
     try {
       final response = await apiClient.filterByArea(area);
-      return MealModel.parseMealsListFromJson(response);
+      final meals = response['meals'] as List?;
+
+      if (meals == null) {
+        return [];
+      }
+
+      return meals
+          .map((meal) => MealModel.fromJson(meal as Map<String, dynamic>))
+          .toList();
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -212,7 +243,15 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
   Future<List<MealModel>> getMealsByIngredient(String ingredient) async {
     try {
       final response = await apiClient.filterByIngredient(ingredient);
-      return MealModel.parseMealsListFromJson(response);
+      final meals = response['meals'] as List?;
+
+      if (meals == null) {
+        return [];
+      }
+
+      return meals
+          .map((meal) => MealModel.fromJson(meal as Map<String, dynamic>))
+          .toList();
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -247,7 +286,7 @@ class MealDbRemoteDataSourceImpl implements MealDbRemoteDataSource {
         print('Erreur lors du chargement des plats de la lettre $letter : $e');
       }
 
-      // Avoid API rate-limit
+      // Évite le rate-limit de l’API
       await Future.delayed(const Duration(milliseconds: 150));
     }
 

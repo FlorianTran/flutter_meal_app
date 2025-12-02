@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../domain/entities/meal.dart';
@@ -8,12 +9,14 @@ class MealOfDayCard extends StatelessWidget {
   final Meal meal;
   final VoidCallback? onTap;
   final bool isFavorite;
+  final VoidCallback? onFavoriteTap;
 
   const MealOfDayCard({
     super.key,
     required this.meal,
     this.onTap,
     this.isFavorite = false,
+    this.onFavoriteTap,
   });
 
   @override
@@ -21,7 +24,7 @@ class MealOfDayCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 280,
+        height: 220,
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -60,95 +63,117 @@ class MealOfDayCard extends StatelessWidget {
                   child: const Icon(Icons.restaurant, size: 64),
                 ),
 
-              // Gradient overlay
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        Colors.black.withAlpha((255 * 0.8).round()),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
               // Favorite icon (top right)
               Positioned(
                 top: 12,
                 right: 12,
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha((255 * 0.9).round()),
-                    shape: BoxShape.circle,
-                  ),
+                child: GestureDetector(
+                  onTap: () {
+                    if (onFavoriteTap != null) {
+                      onFavoriteTap!();
+                    }
+                  },
                   child: Icon(
-                    isFavorite ? Icons.star : Icons.star_border,
-                    color: isFavorite ? Colors.amber : Colors.grey,
-                    size: 24,
+                    isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+                    color: const Color(0xFFFFCC00),
+                    size: 50,
                   ),
                 ),
               ),
 
-              // Meal info overlay (bottom left)
+              // Glassmorphism container with meal info and arrow (bottom left)
               Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              meal.name,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${meal.ingredients.length} ingredients',
-                              style: TextStyle(
-                                color: Colors.white.withAlpha((255 * 0.9).round()),
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
+                bottom: 16,
+                left: 16,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.25),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                          width: 1,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      // Arrow button
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: const BoxDecoration(
-                          color: AppTheme.primaryGreen,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.arrow_forward,
-                          color: Colors.white,
-                          size: 24,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  meal.name,
+                                  style: TextStyle(
+                                    fontFamily:
+                                        AppTheme.getFontFamily(FontWeight.w800),
+                                    color: AppTheme.textBlack,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                '${meal.ingredients.length} ingredients',
+                                style: TextStyle(
+                                  fontFamily:
+                                      AppTheme.getFontFamily(FontWeight.w400),
+                                  color: AppTheme.textBlack,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 4),
+                          // Arrow button with glassmorphism
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(18),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                              child: Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryGreen.withOpacity(0.8),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.arrow_forward,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),

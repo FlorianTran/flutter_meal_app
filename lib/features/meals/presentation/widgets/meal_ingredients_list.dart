@@ -24,9 +24,10 @@ class MealIngredientsList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Ingredients',
           style: TextStyle(
+            fontFamily: AppTheme.getFontFamily(FontWeight.bold),
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -85,9 +86,10 @@ class _IngredientItem extends StatelessWidget {
             child: Text(
               ingredient.name,
               style: TextStyle(
+                fontFamily: AppTheme.getFontFamily(isSelected ? FontWeight.w600 : FontWeight.normal),
                 fontSize: 16,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected ? AppTheme.primaryGreen : Colors.black87,
+                color: isSelected ? AppTheme.primaryGreen : AppTheme.textBlack,
               ),
             ),
           ),
@@ -97,6 +99,7 @@ class _IngredientItem extends StatelessWidget {
             Text(
               ingredient.measurement!,
               style: TextStyle(
+                fontFamily: AppTheme.getFontFamily(null),
                 fontSize: 14,
                 color: Colors.grey[600],
               ),

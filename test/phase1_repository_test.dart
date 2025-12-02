@@ -1,8 +1,8 @@
-import 'package:flutter_meal_app/features/meals/data/datasources/mealdb_local_data_source.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_meal_app/core/network/mealdb_api_client.dart';
 import 'package:flutter_meal_app/features/meals/data/datasources/mealdb_remote_datasource.dart';
+import 'package:flutter_meal_app/features/meals/data/datasources/mealdb_local_data_source.dart';
 import 'package:flutter_meal_app/features/meals/data/repositories_impl/meals_repository_impl.dart';
 import 'package:flutter_meal_app/features/meals/domain/usecases/get_meal_of_day.dart';
 import 'package:flutter_meal_app/features/meals/domain/usecases/get_categories.dart';
@@ -26,7 +26,10 @@ void main() {
       );
       remoteDataSource = MealDbRemoteDataSourceImpl(apiClient: apiClient);
       localDataSource = MealDbLocalDataSourceImpl();
-      repository = MealsRepositoryImpl(remoteDataSource: remoteDataSource, localDataSource: localDataSource);
+      repository = MealsRepositoryImpl(
+        remoteDataSource: remoteDataSource,
+        localDataSource: localDataSource,
+      );
     });
 
     tearDown(() {
