@@ -32,9 +32,9 @@ Future<void> _testSupabaseConnection() async {
 
   try {
     // Essaie une requête simple sur une table (ex: profiles)
-    final response = await supabase.from('profiles').select().limit(1);
+    await supabase.from('profiles').select().limit(1);
 
-    print('Connexion Supabase OK : ${response.toString()}');
+     /* print('Connexion Supabase OK : ${response.toString()}');*/
   } catch (e) {
     print('Erreur de connexion à Supabase : $e');
   }

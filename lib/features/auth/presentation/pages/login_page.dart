@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_meal_app/features/auth/di/auth_injection.dart';
 import '../notifier/auth_notifier.dart';
 import '../notifier/auth_state.dart';
-import 'home_screen.dart';
+import '../../../meals/presentation/pages/home_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -25,7 +26,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         print('Login successful! Navigating to Home Screen.');
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const HomeScreen(),
+            builder: (context) => const HomePage(),
           ),
         );
       }
@@ -112,6 +113,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 },
                 child: const Text('Don\'t have an account? Register'),
               ),
+              const SizedBox(height: 16),
+              const Row(
+                children: [
+                  Expanded(child: Divider()),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text('OR'),
+                  ),
+                  Expanded(child: Divider()),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: authState.isLoading ? null : _performGoogleSignIn,
+                  icon: const Icon(Icons.login), // Replace with a Google icon asset later
+                  label: const Text('Sign in with Google'),
+                ),
+              ),
             ],
           ),
         ),
@@ -119,11 +140,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
+  void _performGoogleSignIn() {
+    ref.read(authRepositoryProvider).signInWithGoogle();
+  }
+
   void _performLogin() {
     if (_formKey.currentState!.validate()) {
       final email = _emailController.text.trim();
       final password = _passwordController.text;
-      
+
       ref.read(authNotifierProvider.notifier).login(email, password);
     }
   }

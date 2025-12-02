@@ -15,6 +15,19 @@ dependencies:
   flutter_riverpod: ^2.4.9
   riverpod_annotation: ^2.3.2
   supabase_flutter: ^2.5.0
+  # HTTP Client
+  http: ^1.1.0
+  # JSON Serialization
+  json_annotation: ^4.8.1
+  # Freezed for immutable models
+  freezed_annotation: ^2.4.1
+  # Image Loading
+  cached_network_image: ^3.3.0
+  # URL Launcher
+  url_launcher: ^6.2.2
+  # Share functionality
+  share_plus: ^7.2.1
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
@@ -22,8 +35,21 @@ dev_dependencies:
   flutter_lints: ^3.0.0
   riverpod_generator: ^2.3.4
   build_runner: ^2.4.7
+  # Code generation
+  json_serializable: ^6.7.1
+  freezed: ^2.4.6
 
 flutter:
   uses-material-design: true
   assets:
     - .env
+    - assets/images/
+  fonts:
+    - family: Sansation
+      fonts:
+        - asset: fonts/sansation/Sansation_Regular.ttf
+        - asset: fonts/sansation/Sansation_Bold.ttf
+          weight: 700
+    - family: SansationLight
+      fonts:
+        - asset: fonts/sansation/Sansation_Light.ttf

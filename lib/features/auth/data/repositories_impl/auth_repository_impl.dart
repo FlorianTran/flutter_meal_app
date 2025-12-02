@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/error/exceptions.dart';
@@ -59,11 +60,36 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<User> getCurrentUser() async {
+  Future<void> signInWithGoogle() async {
+    try {
+      await _supabase.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: kIsWeb ? 'http://localhost:3000' : 'io.supabase.flutterquickstart://login-callback/',
+      );
+    } on AuthException catch (e) {
+      throw ServerException(e.message);
+    } catch (e) {
+      throw ServerException('Google Sign-In failed: ${e.toString()}');
+    }
+  }
+
+  @override
+  Stream<User?> get onAuthStateChange {
+    return _supabase.auth.onAuthStateChange.map((authState) {
+      final supabaseUser = authState.session?.user;
+      if (supabaseUser != null) {
+        return UserModel.fromSupabaseUser(supabaseUser);
+      }
+      return null;
+    });
+  }
+
+  @override
+  Future<User?> getCurrentUser() async {
     try {
       final user = _supabase.auth.currentUser;
       if (user == null) {
-        throw const ServerException('No user logged in');
+        return null;
       }
       return UserModel.fromSupabaseUser(user);
     } catch (e) {
