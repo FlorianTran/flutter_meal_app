@@ -29,6 +29,7 @@ class IngredientsSelectionPage extends ConsumerWidget {
     ref.watch(allMealsPreloadProvider);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Select Ingredients'),
       ),
@@ -61,8 +62,8 @@ class IngredientsSelectionPage extends ConsumerWidget {
                 return GridView.builder(
                   padding: const EdgeInsets.all(8),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    childAspectRatio: 2,
+                    crossAxisCount: 2,
+                    childAspectRatio: 2.5,
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,
                   ),

@@ -90,17 +90,17 @@ class _HomePageState extends ConsumerState<HomePage> {
                 // Ingredient Selection Section
                 _buildIngredientSelectionSection(),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 40),
 
                 // Categories Section
                 _buildCategoriesSection(homeState),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 40),
 
                 // Recently Viewed Section
                 _buildRecentlyViewedSection(),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 40),
 
                 // Favorites Section
                 _buildFavoritesSection(),
@@ -302,9 +302,9 @@ class _HomePageState extends ConsumerState<HomePage> {
               Text(
                 'Categories',
                 style: TextStyle(
-                  fontFamily: AppTheme.getFontFamily(FontWeight.w600),
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+                  fontFamily: AppTheme.getFontFamily(FontWeight.w100),
+                  fontSize: 32,
+                  fontWeight: FontWeight.w100,
                 ),
               ),
               Icon(
@@ -432,9 +432,9 @@ class _HomePageState extends ConsumerState<HomePage> {
               Text(
                 'Recently Viewed',
                 style: TextStyle(
-                  fontFamily: AppTheme.getFontFamily(FontWeight.w600),
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+                  fontFamily: AppTheme.getFontFamily(FontWeight.w100),
+                  fontSize: 32,
+                  fontWeight: FontWeight.w100,
                 ),
               ),
               TextButton(
@@ -516,9 +516,9 @@ class _HomePageState extends ConsumerState<HomePage> {
               Text(
                 'Favorites',
                 style: TextStyle(
-                  fontFamily: AppTheme.getFontFamily(FontWeight.w600),
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+                  fontFamily: AppTheme.getFontFamily(FontWeight.w100),
+                  fontSize: 32,
+                  fontWeight: FontWeight.w100,
                 ),
               ),
               TextButton(

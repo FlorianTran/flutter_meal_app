@@ -30,19 +30,18 @@ class IngredientCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         elevation: 1,
         margin: EdgeInsets.zero,
+        color: Colors.white,
         child: Stack(
-          fit: StackFit.expand,
           children: [
-            // Main content column that fills the card
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
+            // Main content row that fills the card
+            Row(
               children: [
-                // Image takes less space
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.all(4.0),
+                // Image on the left
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 60,
+                    height: 60,
                     child: Image.network(
                       imageUrl,
                       fit: BoxFit.contain,
@@ -51,20 +50,15 @@ class IngredientCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Text takes less space
+                // Text on the right
                 Expanded(
-                  flex: 2,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 4.0, vertical: 2.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Text(
                       ingredientName,
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontFamily: AppTheme.getFontFamily(null),
-                        fontSize: 9,
+                        fontSize: 16,
                       ),
                     ),
                   ),
